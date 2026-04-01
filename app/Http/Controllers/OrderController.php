@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
+use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -19,7 +22,9 @@ class OrderController extends Controller
      */
     public function create()
     {
-        //
+        $customers = Customer::all();
+        $products = Product::all();
+        return view('orders.create', compact('customers', 'products'));
     }
 
     /**
@@ -27,8 +32,29 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        // Validation
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'products' => 'required|array',
+            'quantities' => 'required|array',
+        ]);
+
+        // Create order
+        $order = Order::create([
+            'customer_id' => $request->customer_id,
+            'status' => 'pending',
+        ]);
+
+        // Attach products with quantity
+        foreach ($request->products as $productId) {
+            $quantity = $request->quantities[$productId] ?? 1;
+            $order->products()->attach($productId, ['quantity' => $quantity]);
+        }
+
+        return redirect()->route('orders.index')->with('success', 'Order created successfully!');
     }
+    
 
     /**
      * Display the specified resource.
@@ -59,6 +85,6 @@ class OrderController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        
     }
 }
