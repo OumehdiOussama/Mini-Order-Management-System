@@ -8,6 +8,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Order extends Model {
     use HasFactory;
 
+    public const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+
+    private const STATUS_TRANSITIONS = [
+        'pending' => ['processing', 'cancelled'],
+        'processing' => ['shipped', 'cancelled'],
+        'shipped' => ['delivered', 'cancelled'],
+        'delivered' => [],
+        'cancelled' => [],
+    ];
+
     protected $fillable = [
         'customer_id',
         'status',
@@ -24,21 +34,37 @@ class Order extends Model {
     }
 
     public function timeline() {
-        return $this->hasMany(OrderTimeline::class)->orderBy('created_at', 'desc');
+        return $this->hasMany(OrderTimeline::class)->orderBy('created_at');
+    }
+
+    public function canTransitionTo(string $nextStatus): bool
+    {
+        if ($nextStatus === $this->status) {
+            return true;
+        }
+
+        return in_array($nextStatus, self::STATUS_TRANSITIONS[$this->status] ?? [], true);
+    }
+
+    public function availableTransitionStatuses(): array
+    {
+        $allowedStatuses = self::STATUS_TRANSITIONS[$this->status] ?? [];
+
+        return array_values(array_unique(array_merge([$this->status], $allowedStatuses)));
     }
 
     /**
-     ! Get total price for this order
+     * Get total price for this order.
      */
     public function getTotalPrice()
     {
-        return $this->products->reduce( function($carry, $product) {
+        return $this->products->reduce(function ($carry, $product) {
             return $carry + ($product->price * $product->pivot->quantity);
         }, 0);
     }
 
     /**
-     ! Add a status change to the timeline
+     * Add a status change to the timeline.
      */
     public function addTimeline($status, $notes = null, $trackingNumber = null, $carrier = null)
     {
