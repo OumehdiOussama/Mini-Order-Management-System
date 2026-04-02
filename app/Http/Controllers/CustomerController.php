@@ -8,11 +8,20 @@ use Illuminate\Http\Request;
 class CustomerController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a list of all customers with search functionality.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $customers = Customer::all();
+        $query = Customer::query();
+        
+        // Search customers by name or email
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%");
+        }
+        
+        $customers = $query->paginate(10);
         return view('customers.index', compact('customers'));
     }
 
@@ -41,17 +50,18 @@ class CustomerController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display customer details with their orders.
      */
-    public function show(string $id)
+    public function show(Customer $customer)
     {
-        //
+        $customer->load('orders');
+        return view('customers.show', compact('customer'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Customer $customer)
     {
         return view('customers.edit', compact('customer'));
     }
@@ -62,18 +72,18 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer)
     {
         $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:customers,email,'.$customer->id,
-        'phone' => 'required|string|max:20',
-    ]);
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:customers,email,'.$customer->id,
+            'phone' => 'required|string|max:20',
+        ]);
 
-    $customer->update($request->all());
+        $customer->update($request->all());
 
-    return redirect()->route('customers.index')->with('success', 'Customer updated successfully!');
+        return redirect()->route('customers.index')->with('success', 'Customer updated successfully!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the customer and redirect to list.
      */
     public function destroy(Customer $customer)
     {
