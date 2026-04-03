@@ -1,59 +1,161 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mini Order Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A simple Laravel application for managing customer orders from creation until final delivery status.
+This is an intern project designed to teach core Laravel development concepts.
 
-## About Laravel
+## Project Goal
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Build a Laravel system to manage customer orders from creation until final delivery/cancellation, with clear status tracking and basic reporting.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Customer Management
 
-## Learning Laravel
+- Create new customer records (name, email, phone)
+- View all customers (with pagination)
+- Search customers by name or email
+- Edit customer details
+- Delete customers
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Product Management
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Create product records (name, price)
+- View all products
+- Edit product details
+- Delete products
+- Product validation enforces `price >= 1`
 
-## Laravel Sponsors
+### Order Management
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- Create orders linked to a specific customer
+- Add multiple products with quantities to each order
+- Business rule check: quantity must be greater than 0 for selected products
+- Status tracking with: `pending`, `processing`, `shipped`, `delivered`, `cancelled`
+- Status workflow validation (prevents invalid jumps)
+- Shipping fields (`tracking_number`, `carrier`) required when status is set to `shipped`
+- Chronological order timeline with timestamped status changes
+- View orders with current status, customer info, and total price
+- Update order status
+- Delete orders
 
-### Premium Partners
+### Basic Reporting (Dashboard)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+- Total number of orders
+- Number of orders by status
+- 5 most recent orders
+- Total number of customers
+- Total number of products
 
-## Contributing
+## Technology Stack
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- Framework: Laravel 12
+- Database: MySQL
+- Frontend: Blade Templates + Tailwind CSS
+- PHP Version: 8.2+
 
-## Code of Conduct
+## Prerequisites
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- PHP 8.2 or higher
+- Composer
+- MySQL Server
+- Node.js and npm
 
-## Security Vulnerabilities
+## Installation & Setup
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 1. Install Dependencies
+
+```bash
+composer install
+npm install
+```
+
+### 2. Create Environment File
+
+Linux/macOS:
+
+```bash
+cp .env.example .env
+```
+
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+### 3. Configure Database in `.env`
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=order_management
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 4. Generate App Key
+
+```bash
+php artisan key:generate
+```
+
+### 5. Run Migrations
+
+```bash
+php artisan migrate
+```
+
+### 6. (Optional) Seed Demo Data
+
+```bash
+php artisan db:seed
+```
+
+### 7. Run the Application
+
+Terminal 1:
+
+```bash
+npm run dev
+```
+
+Terminal 2:
+
+```bash
+php artisan serve
+```
+
+Application URL:
+
+`http://127.0.0.1:8000`
+
+## Main Routes
+
+- `/` (Dashboard)
+- `/dashboard`
+- `/customers`
+- `/products`
+- `/orders`
+
+## Validation Rules
+
+- Customers: name required, email required + unique, phone required
+- Products: name required, price required, numeric, minimum 1
+- Orders: customer required, products array required, each selected product must have quantity > 0
+- Order status: must be one of pending, processing, shipped, delivered, cancelled + workflow transition check
+- Shipping fields: required when updating status to shipped
+
+## Notes
+
+- Eloquent relationships implemented:
+  - `Customer` has many `Order`
+  - `Order` belongs to `Customer`
+  - `Order` belongs to many `Product` with pivot `quantity`
+  - `Order` has many `OrderTimeline`
+- Order timeline is displayed in chronological order.
+- Application database is MySQL (configured in `.env` / `.env.example`).
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-source and available under the MIT license.
