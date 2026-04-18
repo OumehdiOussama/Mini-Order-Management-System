@@ -2,12 +2,7 @@
     <div class="container flex items-center justify-between mx-auto">
 
         <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-2xl font-bold transition hover:opacity-80">
-            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="3" y="3" width="8" height="8" fill="#76d141" rx="1"/>
-                <rect x="13" y="3" width="8" height="8" fill="#facc15" rx="1"/>
-                <rect x="3" y="13" width="8" height="8" fill="#facc15" rx="1"/>
-                <rect x="13" y="13" width="8" height="8" fill="#76d141" rx="1"/>
-            </svg>
+            <img src="{{ asset('favicon.svg') }}" class="w-8 h-8" alt="logo">
             <span style="color: #76d141">Order</span>
             <span style="color: #facc15">Management</span>
         </a>
