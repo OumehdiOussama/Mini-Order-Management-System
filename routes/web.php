@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -28,7 +29,10 @@ Route::middleware("auth")->group(function(){
     Route::resource("products", ProductController::class);
     Route::resource("orders", OrderController::class);
 
+    Route::view('/profile', 'auth.profile')->name("profile");
+    Route::put('/profile', UpdateProfileController::class);
 
+    Route::post("/change-password", ChangePasswordController::class);
 
     Route::post('/logout', LogoutController::class)->name("logout");
 });

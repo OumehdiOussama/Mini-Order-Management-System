@@ -9,9 +9,14 @@
     <p class="text-gray-600">Manage your account settings</p>
 </div>
 
-@if(session("Profile_success"))
+@if(session("success"))
     <div class="px-4 py-3 mb-4 text-green-700 bg-green-100 border border-green-400 rounded">
-        {{ session("Profile_success") }}
+        {{ session("success") }}
+    </div>
+@endif
+@if(session("error"))
+    <div class="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
+        {{ session("error") }}
     </div>
 @endif
 
@@ -71,7 +76,7 @@
     <div id="passwordTab" class="hidden tab-content">
         <h2 class="mb-4 text-xl font-bold text-gray-800">Change Password</h2>
 
-        <form method="POST">
+        <form action="{{ url("/change-password") }}" method="POST">
             @csrf
 
             <div class="mb-4">
