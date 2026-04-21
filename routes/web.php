@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\UpdateProfileController;
+use App\Http\Controllers\Auth\VerifyAccountController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
@@ -26,6 +27,9 @@ Route::view("/reset-password/{token}","auth.reset-password")->name("password.res
 
 Route::post("/forgot-password", ForgotPasswordController::class)->name("password.email");
 Route::post("/reset-password", ResetPasswordController::class)->name("password.update");
+
+Route::view("/verify-email/{email}","auth.verify-email")->name("email.verify");
+Route::post("/verify-email",VerifyAccountController::class);
 
 Route::middleware("auth")->group(function(){
     Route::get("/dashboard", [DashboardController::class, "index"])->name("dashboard.index");

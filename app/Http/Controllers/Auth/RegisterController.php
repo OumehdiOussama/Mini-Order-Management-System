@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Mail\VerifyAccountMail;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
@@ -15,9 +16,11 @@ class RegisterController extends Controller
         $user = User::create([
             "name" => $request->name,
             "email" => $request->email,
-            "password" => Hash::make($request->password)
+            "password" => Hash::make($request->password),
+            "otp"=>rand(100000,999999)
         ]);
-        Auth::login($user);
-        return redirect()->to("/login")->with("success","You have created your account successfully !");
+        Mail::to($user->email)->send(new VerifyAccountMail($user->otp, $user->email));
+        
+        return redirect()->route("email.verify",$user->email);
     }
 }
