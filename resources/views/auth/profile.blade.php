@@ -57,6 +57,16 @@
             </div>
 
             <div class="mb-4">
+                <label class="block mb-1 text-gray-600">Phon</label>
+                <input type="text" name="phone"
+                    value="{{ auth()->user()->phone }}"
+                    class="w-full p-3 transition border-2 border-gray-300 rounded focus:border-blue-600 focus:outline-none">
+                @error('phone')
+                    <div class="mt-1 text-sm text-red-500">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-4">
                 <label class="block mb-1 text-gray-600">Email</label>
                 <input type="email" name="email"
                     value="{{ auth()->user()->email }}"

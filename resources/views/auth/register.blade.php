@@ -27,6 +27,20 @@
                 @enderror
             </div>
 
+            <!-- Phone -->
+            <div>
+                <label class="block mb-0.5 text-sm text-gray-300">Phone</label>
+
+                <input type="text" name="phone" value="{{ old('phone') }}"
+                    class="w-full p-2.5 text-sm text-gray-100 bg-gray-700 border rounded focus:outline-none focus:ring-2 border-gray-600 focus:ring-blue-500">
+
+                @error("phone")
+                    <span class="block mt-1 text-xs text-red-400">
+                        {{ $message }}
+                    </span>
+                @enderror
+            </div>
+
             <!-- Email -->
             <div>
                 <label class="block mb-0.5 text-sm text-gray-300">Email</label>

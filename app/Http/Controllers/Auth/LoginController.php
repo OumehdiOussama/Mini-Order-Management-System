@@ -14,13 +14,15 @@ class LoginController extends Controller
 {
     public function __invoke(LoginRequest $request)
     {
-       $user = User::where('email', $request->email)->first();
+        $type = filter_var($request->input('identifier'), FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        
+        $user = User::where($type, $request->identifier)->first();
 
         if(!$user || !Hash::check($request->password, $user->password)){
             return back()->with('error', 'Invalid credentials!');
         }
 
-        if(!$user->email_verified_at){
+        if(!$user->account_verified_at){
             Mail::to($user->email)->send(new VerifyAccountMail($user->otp, $user->email));
             return redirect()->route('email.verify', $user->email);
         }
