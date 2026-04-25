@@ -23,13 +23,13 @@ Route::post("/register",RegisterController::class);
 Route::post('/login', LoginController::class);
 
 Route::view("/forgot-password","auth.forgot-password")->name("password.request");
-Route::view("/reset-password/{token}","auth.reset-password")->name("password.reset");
-
 Route::post("/forgot-password", ForgotPasswordController::class)->name("password.email");
+
+Route::view("/reset-password/{token}","auth.reset-password")->name("password.reset");
 Route::post("/reset-password", ResetPasswordController::class)->name("password.update");
 
-Route::view("/verify-email/{email}","auth.verify-email")->name("email.verify");
-Route::post("/verify-email",VerifyAccountController::class);
+Route::view("/verify-account/{identifier}","auth.verify-account")->name("account.verify");
+Route::post("/verify-account",VerifyAccountController::class);
 
 Route::middleware("auth")->group(function(){
     Route::get("/dashboard", [DashboardController::class, "index"])->name("dashboard.index");

@@ -13,14 +13,16 @@ class VerifyAccountController extends Controller
      */
     public function __invoke(VerifyAccountRequest $request)
     {
-        $user = User::where("email",$request->email)->first();
+        $type = filter_var($request->input('identifier'), FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        
+        $user = User::where($type, $request->identifier)->first();
         if($user->otp != implode("",$request->otp)){
-            return back()->with("error","Invalid OTP or email address");
+            return back()->with("error","Invalid OTP or account data");
         }
 
         $user->account_verified_at = now();
         $user->save();
 
-        return redirect()->route("login")->with("success", "Email verified successfully, you can login now");
+        return redirect()->route("login")->with("success", "Your account verified successfully, you can login now");
     }
 }

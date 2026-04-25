@@ -22,6 +22,6 @@ class RegisterController extends Controller
         ]);
         Mail::to($user->email)->send(new VerifyAccountMail($user->otp, $user->email));
         
-        return redirect()->route("email.verify",$user->email);
+        return redirect()->route("account.verify",$user->email);
     }
 }

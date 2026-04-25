@@ -24,7 +24,7 @@ class LoginController extends Controller
 
         if(!$user->account_verified_at){
             Mail::to($user->email)->send(new VerifyAccountMail($user->otp, $user->email));
-            return redirect()->route('email.verify', $user->email);
+            return redirect()->route('account.verify', $user->email);
         }
 
         Auth::login($user);
