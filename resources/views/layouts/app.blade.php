@@ -26,8 +26,6 @@
             </div>
         </main>
 
-        @include("partials.footer")
-
     </div>
 
     @include("partials.modal")

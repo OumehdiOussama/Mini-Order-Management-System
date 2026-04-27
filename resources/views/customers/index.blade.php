@@ -22,7 +22,7 @@
 
     @if($customers->isEmpty())
         <div class="p-8 text-center bg-white rounded-lg shadow-md">
-            <p class="mb-4 text-lg text-gray-600">No customers found.</p>
+            <p class="mb-4 text-lg text-gray-600 mb-5">No customers found.</p>
             <a href="{{ route('customers.create') }}" class="px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">Create First Customer</a>
         </div>
     @else
