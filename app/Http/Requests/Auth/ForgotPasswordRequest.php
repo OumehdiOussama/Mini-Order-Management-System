@@ -26,4 +26,11 @@ class ForgotPasswordRequest extends FormRequest
             "email"=> "required|string|email|exists:users,email"
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.exists' => 'This email address is not registered. Please check the email or create a new account.',
+        ];
+    }
 }

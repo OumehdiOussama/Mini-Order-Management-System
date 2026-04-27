@@ -12,9 +12,26 @@ class OrderController extends Controller
     /**
      * Display a list of all orders with pagination.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with(['customer', 'products'])->orderBy('created_at', 'desc')->paginate(10);
+        $query = Order::with(['customer', 'products']);
+
+        // Filter by Status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Search by Customer Name or Email
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('customer', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+        
         return view('orders.index', compact('orders'));
     }
 

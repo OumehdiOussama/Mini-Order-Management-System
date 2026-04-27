@@ -21,7 +21,7 @@ class CustomerController extends Controller
                 ->orWhere('email', 'like', "%{$search}%");
         }
         
-        $customers = $query->paginate(10);
+        $customers = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         return view('customers.index', compact('customers'));
     }
 

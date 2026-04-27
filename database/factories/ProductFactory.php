@@ -36,7 +36,7 @@ class ProductFactory extends Factory
 
         return [
             'name' => fake()->randomElement($products),
-            'price' => fake()->randomFloat(2, 10, 500),
+            'price' => fake()->randomFloat(2,10,500),
         ];
     }
 }

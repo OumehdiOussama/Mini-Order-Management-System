@@ -10,9 +10,16 @@ class ProductController extends Controller
     /*
      * Display a listing of all products.
     */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $query = Product::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $products = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
+        
         return view('products.index', compact('products'));
     }
 

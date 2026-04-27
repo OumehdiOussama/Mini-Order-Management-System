@@ -26,6 +26,6 @@ class ForgotPasswordController extends Controller
 
         Mail::to($request->email)->send(new SendResetLinkMail($token));
         
-        return back()->with("success","We have sent you an email with the reset link");
+        return back()->with("success","We’ve sent you a password reset link. Please check your email.");
     }
 }

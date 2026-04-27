@@ -41,5 +41,6 @@ Route::middleware("auth")->group(function(){
     Route::put('/profile', UpdateProfileController::class);
     Route::post("/change-password", ChangePasswordController::class);
 
+    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
     Route::post('/logout', LogoutController::class)->name("logout");
 });
