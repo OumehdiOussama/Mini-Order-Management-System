@@ -24,7 +24,8 @@ class User extends Authenticatable
         'email',
         'password',
         "otp",
-        "account_verified_at"
+        "account_verified_at",
+        "role"
     ];
 
     /**
@@ -48,5 +49,13 @@ class User extends Authenticatable
             'account_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the customer profile associated with the user.
+     */
+    public function customer()
+    {
+        return $this->hasOne(Customer::class);
     }
 }

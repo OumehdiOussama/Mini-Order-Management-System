@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" x-data="darkMode()">
+<head>
     <script>
         // ULTIMATE ANTI-FLASH: Direct variable injection
         (function() {
@@ -11,16 +12,15 @@
             if (isDark) {
                 root.classList.add('dark');
                 root.style.colorScheme = 'dark';
-                root.style.setProperty('--surface-bg', '#0f172a');
-                root.style.setProperty('--text-primary', '#f1f5f9');
             } else {
                 root.classList.remove('dark');
                 root.style.colorScheme = 'light';
-                root.style.setProperty('--surface-bg', '#f8fafc');
-                root.style.setProperty('--text-primary', '#0f172a');
             }
         })();
     </script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -37,10 +37,13 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
+    <!-- HTMX for SPA Navigation -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
     @stack('head')
 </head>
 
-<body class="min-h-screen bg-[var(--surface-bg)] text-[var(--text-primary)] font-sans antialiased">
+<body hx-boost="true" class="min-h-screen bg-[var(--surface-bg)] text-[var(--text-primary)] font-sans antialiased">
 
     <!-- Sidebar -->
     @include('partials.sidebar')
@@ -75,20 +78,16 @@
         function darkMode() {
             return {
                 isDark: document.documentElement.classList.contains('dark'),
-                toggle() {
+                toggleTheme() {
                     this.isDark = !this.isDark;
                     const root = document.documentElement;
                     if (this.isDark) {
                         root.classList.add('dark');
                         root.style.colorScheme = 'dark';
-                        root.style.setProperty('--surface-bg', '#0f172a');
-                        root.style.setProperty('--text-primary', '#f1f5f9');
                         localStorage.setItem('theme', 'dark');
                     } else {
                         root.classList.remove('dark');
                         root.style.colorScheme = 'light';
-                        root.style.setProperty('--surface-bg', '#f8fafc');
-                        root.style.setProperty('--text-primary', '#0f172a');
                         localStorage.setItem('theme', 'light');
                     }
                 }
@@ -96,8 +95,8 @@
         }
 
         // Sidebar collapse persistence
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('main-content');
+        var sidebar = document.getElementById('sidebar');
+        var mainContent = document.getElementById('main-content');
         function applySidebarState(collapsed) {
             if (collapsed) {
                 mainContent.style.marginLeft = '72px';

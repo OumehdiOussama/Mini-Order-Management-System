@@ -92,20 +92,38 @@
                 <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:16px;color:white;font-weight:700;shrink:0">
                     {{ strtoupper(substr($order->customer->name, 0, 2)) }}
                 </div>
-                <div class="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <p class="text-xs text-slate-400">Name</p>
-                        <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ $order->customer->name }}</p>
+                <div class="flex-1 flex flex-col gap-3 min-w-0">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 mb-0.5">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                <p class="text-xs text-slate-400">Name</p>
+                            </div>
+                            <p class="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate" title="{{ $order->customer->name }}">{{ $order->customer->name }}</p>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-1.5 mb-0.5">
+                                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                <p class="text-xs text-slate-400">Email</p>
+                            </div>
+                            <a href="mailto:{{ $order->customer->email }}"
+                               class="text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline truncate block w-full"
+                               title="{{ $order->customer->email }}">
+                                {{ $order->customer->email }}
+                            </a>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs text-slate-400">Email</p>
-                        <a href="mailto:{{ $order->customer->email }}"
-                           class="text-sm font-medium text-brand-600 dark:text-brand-400 hover:underline">
-                            {{ $order->customer->email }}
-                        </a>
-                    </div>
-                    <div>
-                        <p class="text-xs text-slate-400">Phone</p>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5 mb-0.5">
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            <p class="text-xs text-slate-400">Phone</p>
+                        </div>
                         <p class="text-sm font-medium text-slate-800 dark:text-slate-200">{{ $order->customer->phone }}</p>
                     </div>
                 </div>

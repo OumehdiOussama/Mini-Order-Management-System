@@ -9,7 +9,7 @@
     <div>
         <h1 class="page-title">
             Good {{ now()->hour < 12 ? 'morning' : (now()->hour < 17 ? 'afternoon' : 'evening') }},
-            {{ auth()->user()->name ?? 'there' }} 👋
+            {{ auth()->user()->name ?? 'there' }}
         </h1>
         <p class="page-subtitle">{{ now()->format('l, F j, Y') }} · Here's what's happening today</p>
     </div>
@@ -44,6 +44,7 @@
         </div>
     </div>
 
+    @if(auth()->user()->role !== 'customer')
     {{-- Total Revenue --}}
     <div class="stat-card">
         <div class="stat-icon bg-emerald-100 dark:bg-emerald-900/30">
@@ -78,10 +79,36 @@
         </div>
         <div>
             <p class="stat-label">Total Customers</p>
-            <p class="stat-value">{{ number_format($totalCustomers) }}</p>
+            <p class="stat-value">{{ number_format($totalCustomers ?? 0) }}</p>
             <p class="stat-trend text-slate-400">Registered accounts</p>
         </div>
     </div>
+    @else
+    {{-- Total Spent (Customer) --}}
+    <div class="stat-card">
+        <div class="stat-icon bg-emerald-100 dark:bg-emerald-900/30">
+            <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+        <div>
+            <p class="stat-label">Total Spent</p>
+            @php
+                $totalSpent = \App\Models\Order::with('products')
+                    ->where('customer_id', auth()->user()->customer?->id ?? -1)
+                    ->where('status', '!=', 'cancelled')
+                    ->get()
+                    ->sum(fn($o) => $o->getTotalPrice());
+            @endphp
+            <p class="stat-value text-emerald-600 dark:text-emerald-400">
+                {{ number_format($totalSpent, 0) }}
+                <span class="text-sm font-medium ml-0.5">MAD</span>
+            </p>
+            <p class="stat-trend text-slate-400">Excluding cancelled</p>
+        </div>
+    </div>
+    @endif
 
     {{-- Delivered Orders --}}
     <div class="stat-card">
@@ -250,7 +277,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+(function () {
 
     const isDark = document.documentElement.classList.contains('dark');
     const gridColor  = isDark ? 'rgba(51,65,85,0.6)' : 'rgba(226,232,240,0.8)';
@@ -259,7 +286,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // ── Orders last 7 days (line chart) ──────────────────
     @php
         $last7Days = collect(range(6, 0))->map(fn($d) => now()->subDays($d));
-        $ordersPerDay = $last7Days->map(fn($day) => \App\Models\Order::whereDate('created_at', $day)->count());
+        if (auth()->user()->role === 'customer') {
+            $ordersPerDay = $last7Days->map(fn($day) => \App\Models\Order::where('customer_id', auth()->user()->customer?->id ?? -1)->whereDate('created_at', $day)->count());
+        } else {
+            $ordersPerDay = $last7Days->map(fn($day) => \App\Models\Order::whereDate('created_at', $day)->count());
+        }
         $dayLabels    = $last7Days->map(fn($day) => $day->format('D'));
     @endphp
 
@@ -355,6 +386,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-});
+})();
 </script>
 @endpush

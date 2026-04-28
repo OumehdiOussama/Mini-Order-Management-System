@@ -32,9 +32,15 @@ Route::view("/verify-account/{identifier}","auth.verify-account")->name("account
 Route::post("/verify-account",VerifyAccountController::class);
 
 Route::middleware("auth")->group(function(){
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
+        Route::get('/customers/export', [CustomerController::class, 'export'])->name('customers.export');
+    });
+
     Route::get("/dashboard", [DashboardController::class, "index"])->name("dashboard.index");
     Route::resource("customers", CustomerController::class);
     Route::resource("products", ProductController::class);
+    Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
     Route::resource("orders", OrderController::class);
 
     Route::view('/profile', 'auth.profile')->name("profile");

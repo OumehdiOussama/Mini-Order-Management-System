@@ -97,7 +97,7 @@
         <div>
             {{-- Section label --}}
             <div x-show="!collapsed" x-transition
-                 class="section-label mb-2">
+                 class="mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider px-3">
                 {{ $section['label'] }}
             </div>
 

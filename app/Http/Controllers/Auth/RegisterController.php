@@ -18,8 +18,12 @@ class RegisterController extends Controller
             "phone" => $request->phone,
             "email" => $request->email,
             "password" => Hash::make($request->password),
-            "otp"=>rand(100000,999999)
+            "otp"=>rand(100000,999999),
+            "role" => "customer" // Ensure role is set
         ]);
+        
+        event(new \App\Events\UserRegistered($user));
+
         Mail::to($user->email)->send(new VerifyAccountMail($user->otp, $user->email));
         
         return redirect()->route("account.verify",$user->email);

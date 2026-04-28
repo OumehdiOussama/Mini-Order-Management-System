@@ -1,26 +1,26 @@
-<header class="sticky top-0 z-40 h-16 flex items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-5 sm:px-6 lg:px-8 gap-4">
+<header class="sticky top-0 z-40 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-5 sm:px-6 lg:px-8">
+    <div class="w-full mx-auto max-w-7xl h-full flex items-center gap-4">
+        {{-- Page Title --}}
+        <div class="flex-1 min-w-0">
+            <h1 class="text-base font-semibold text-slate-800 dark:text-white truncate">
+                @yield('title', 'Dashboard')
+            </h1>
+        </div>
 
-    {{-- Page Title --}}
-    <div class="flex-1 min-w-0">
-        <h1 class="text-base font-semibold text-slate-800 dark:text-white truncate">
-            @yield('title', 'Dashboard')
-        </h1>
-    </div>
-
-    {{-- Right Controls --}}
-    <div class="flex items-center gap-2">
+        {{-- Right Controls --}}
+        <div class="flex items-center gap-2">
 
         {{-- Dark Mode Toggle --}}
-        <button @click="toggle()"
-                class="btn-icon text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+        <button @click="toggleTheme()"
+                class="btn-icon text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-0"
                 :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
             {{-- Sun --}}
-            <svg x-show="isDark" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg x-show="isDark" x-cloak class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                       d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
             </svg>
             {{-- Moon --}}
-            <svg x-show="!isDark" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg x-show="!isDark" x-cloak class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                       d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
             </svg>
@@ -32,7 +32,7 @@
         {{-- User Dropdown --}}
         <div x-data="{ open: false }" class="relative">
             <button @click="open = !open"
-                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-150">
+                    class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-150 focus:outline-none focus:ring-0">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white shrink-0"
                      style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
                     {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
@@ -51,7 +51,7 @@
             </button>
 
             {{-- Dropdown Menu --}}
-            <div x-show="open"
+            <div x-show="open" x-cloak
                  x-transition:enter="transition ease-out duration-150"
                  x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
                  x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -59,7 +59,7 @@
                  x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                  x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
                  @click.outside="open = false"
-                 class="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-slate-800 rounded-xl shadow-dropdown border border-slate-200 dark:border-slate-700 py-1 z-50">
+                 class="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-slate-800 rounded-xl shadow-dropdown border border-slate-200 dark:border-slate-700 py-1 z-[100]">
 
                 <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
                     <p class="text-sm font-semibold text-slate-800 dark:text-white">{{ auth()->user()->name ?? 'User' }}</p>
@@ -89,6 +89,7 @@
                     </form>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </header>

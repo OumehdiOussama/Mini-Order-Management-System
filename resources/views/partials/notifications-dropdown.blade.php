@@ -47,20 +47,20 @@
 
     {{-- Bell Button --}}
     <button @click="open = !open"
-            class="relative btn-icon text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
+            class="relative btn-icon text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-0">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                   d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
         </svg>
         {{-- Unread badge --}}
-        <span x-show="unreadCount > 0"
+        <span x-show="unreadCount > 0" x-cloak
               x-text="unreadCount > 9 ? '9+' : unreadCount"
               class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
         </span>
     </button>
 
     {{-- Dropdown Panel --}}
-    <div x-show="open"
+    <div x-show="open" x-cloak
          x-transition:enter="transition ease-out duration-150"
          x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
          x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -68,7 +68,7 @@
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
          @click.outside="open = false"
-         class="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-dropdown border border-slate-200 dark:border-slate-700 z-50 overflow-hidden">
+         class="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-dropdown border border-slate-200 dark:border-slate-700 z-[100] overflow-hidden">
 
         {{-- Header --}}
         <div class="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">
@@ -79,7 +79,7 @@
                       x-text="unreadCount + ' new'">
                 </span>
             </div>
-            <button x-show="unreadCount > 0"
+            <button x-show="unreadCount > 0" x-cloak
                     @click="markAllRead()"
                     class="text-xs text-brand-500 hover:text-brand-600 font-medium transition-colors">
                 Mark all read

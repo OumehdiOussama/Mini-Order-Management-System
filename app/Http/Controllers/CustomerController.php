@@ -90,4 +90,12 @@ class CustomerController extends Controller
         $customer->delete();
         return redirect()->route('customers.index')->with('success', 'Customer deleted!');
     }
+
+    /*
+     * Export customers to Excel
+     */
+    public function export()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\CustomersExport, 'customers.xlsx');
+    }
 }

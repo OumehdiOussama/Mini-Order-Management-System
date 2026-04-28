@@ -14,7 +14,17 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
+        $user = $request->user();
         $query = Order::with(['customer', 'products']);
+
+        // Scope orders if user is a customer
+        if ($user->role === 'customer') {
+            if ($user->customer) {
+                $query->where('customer_id', $user->customer->id);
+            } else {
+                $query->where('id', '<', 0); // No orders if no profile
+            }
+        }
 
         // Filter by Status
         if ($request->filled('status')) {
@@ -90,6 +100,14 @@ class OrderController extends Controller
         // Add initial timeline entry
         $order->addTimeline('pending', 'Order created');
 
+        // Trigger Notifications
+        $adminsAndStaff = \App\Models\User::whereIn('role', ['admin', 'staff'])->get();
+        \Illuminate\Support\Facades\Notification::send($adminsAndStaff, new \App\Notifications\NewOrderCreated($order));
+
+        if ($order->customer && $order->customer->user) {
+            $order->customer->user->notify(new \App\Notifications\OrderStatusUpdated($order));
+        }
+
         return redirect()->route('orders.index')->with('success', 'Order created successfully!');
     }
 
@@ -156,6 +174,11 @@ class OrderController extends Controller
             $carrier
         );
 
+        // Trigger Notification
+        if ($order->customer && $order->customer->user) {
+            $order->customer->user->notify(new \App\Notifications\OrderStatusUpdated($order));
+        }
+
         return redirect()->route('orders.show', $order)->with('success', 'Order status updated successfully!');
     }
 
@@ -166,5 +189,24 @@ class OrderController extends Controller
     {
         $order->delete();
         return redirect()->route('orders.index')->with('success', 'Order deleted successfully!');
+    }
+
+    /*
+     * Export orders to Excel
+     */
+    public function export()
+    {
+        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\OrdersExport, 'orders.xlsx');
+    }
+
+    /*
+     * Download Order Invoice (PDF)
+     */
+    public function invoice(Order $order)
+    {
+        \Illuminate\Support\Facades\Gate::authorize('downloadInvoice', $order);
+        $order->load(['customer', 'products']);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.order', compact('order'));
+        return $pdf->download('invoice-' . $order->id . '.pdf');
     }
 }
