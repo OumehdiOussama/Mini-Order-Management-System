@@ -16,10 +16,26 @@
                 root.classList.remove('dark');
                 root.style.colorScheme = 'light';
             }
+
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                root.classList.add('sidebar-collapsed');
+            }
         })();
     </script>
     <style>
         [x-cloak] { display: none !important; }
+        
+        /* Sidebar Layout Control */
+        #sidebar { width: 256px; transition: width 0.3s ease-in-out, transform 0.3s ease-in-out; }
+        #main-content { margin-left: 256px; transition: margin-left 0.3s ease-in-out; }
+        
+        .sidebar-collapsed #sidebar { width: 72px; }
+        .sidebar-collapsed #main-content { margin-left: 72px; }
+        
+        @media (max-width: 1023px) {
+            #main-content { margin-left: 0 !important; }
+            #sidebar { transform: translateX(-100%); }
+        }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,8 +65,7 @@
     @include('partials.sidebar')
 
     <!-- Main Wrapper -->
-    <div class="flex flex-col min-h-screen" id="main-content"
-         style="margin-left: 256px; transition: margin-left 0.3s ease;" x-ref="mainContent">
+    <div class="flex flex-col min-h-screen" id="main-content">
 
         <!-- Top Header -->
         @include('partials.header')
@@ -93,35 +108,6 @@
                 }
             }
         }
-
-        // Sidebar collapse persistence
-        var sidebar = document.getElementById('sidebar');
-        var mainContent = document.getElementById('main-content');
-        function applySidebarState(collapsed) {
-            if (collapsed) {
-                mainContent.style.marginLeft = '72px';
-            } else {
-                mainContent.style.marginLeft = '256px';
-            }
-        }
-        if (localStorage.getItem('sidebarCollapsed') === 'true') {
-            applySidebarState(true);
-        }
-        window.addEventListener('sidebar-toggle', (e) => {
-            applySidebarState(e.detail.collapsed);
-            localStorage.setItem('sidebarCollapsed', e.detail.collapsed);
-        });
-
-        // Mobile sidebar
-        window.addEventListener('resize', () => {
-            if (window.innerWidth < 1024) {
-                mainContent.style.marginLeft = '0';
-            } else {
-                const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-                applySidebarState(collapsed);
-            }
-        });
-        if (window.innerWidth < 1024) mainContent.style.marginLeft = '0';
     </script>
 
     @stack('scripts')

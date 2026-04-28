@@ -65,14 +65,16 @@
         toggle() {
             this.collapsed = !this.collapsed;
             localStorage.setItem('sidebarCollapsed', this.collapsed);
-            window.dispatchEvent(new CustomEvent('sidebar-toggle', { detail: { collapsed: this.collapsed } }));
+            if (this.collapsed) {
+                document.documentElement.classList.add('sidebar-collapsed');
+            } else {
+                document.documentElement.classList.remove('sidebar-collapsed');
+            }
         }
     }"
-    :class="collapsed ? 'w-[72px]' : 'w-64'"
     class="fixed inset-y-0 left-0 z-50 flex flex-col bg-slate-900 border-r border-slate-800
            transition-[width,transform] duration-300 ease-in-out
-           -translate-x-full lg:translate-x-0"
-    id="sidebar">
+           -translate-x-full lg:translate-x-0">
 
     {{-- Logo --}}
     <div class="flex items-center h-16 px-4 border-b border-slate-800 shrink-0">

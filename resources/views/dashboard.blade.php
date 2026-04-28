@@ -147,7 +147,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         @foreach($ordersByStatus as $status => $count)
         @php $cfg = $statusConfig[$status]; @endphp
-        <div class="flex flex-col items-center p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 transition-all duration-200">
+        <div class="flex flex-col items-center p-4 rounded-xl bg-slate-100 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 transition-all duration-200">
             <div class="w-10 h-10 rounded-full {{ $cfg['color'] }} flex items-center justify-center mb-2">
                 <span class="text-white font-bold text-sm">{{ $count }}</span>
             </div>
@@ -370,7 +370,7 @@
                             font: { size: 11 },
                             padding: 12,
                             usePointStyle: true,
-                            pointStyleWidth: 8,
+                            pointStyle: 'circle',
                         }
                     },
                     tooltip: {
