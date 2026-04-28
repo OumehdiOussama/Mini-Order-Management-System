@@ -21,7 +21,7 @@
         <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-5">
             Product Information
         </h2>
-        <form method="POST" action="{{ route('products.store') }}" class="space-y-5">
+        <form method="POST" action="{{ route('products.store') }}" class="space-y-5" enctype="multipart/form-data">
             @csrf
 
             <div class="form-group">
@@ -39,6 +39,13 @@
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium">MAD</span>
                 </div>
                 @error('price') <span class="input-error">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="image" class="input-label">Product Image</label>
+                <input type="file" id="image" name="image" class="input-field py-2" accept="image/*">
+                <p class="mt-1.5 text-xs text-slate-500">Supported formats: JPG, PNG, GIF. Max 2MB.</p>
+                @error('image') <span class="input-error">{{ $message }}</span> @enderror
             </div>
 
             <div class="flex gap-3 pt-2">

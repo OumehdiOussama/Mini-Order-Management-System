@@ -79,10 +79,23 @@
                            @click="toggle({{ $product->id }})"
                            :checked="isSelected({{ $product->id }})"
                            class="w-4 h-4 accent-brand-500 cursor-pointer rounded">
+                    {{-- Product Image --}}
+                    <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0 overflow-hidden">
+                        @if($product->image_path)
+                            <img src="{{ asset('storage/' . $product->image_path) }}" 
+                                 alt="{{ $product->name }}" 
+                                 class="w-full h-full object-cover">
+                        @else
+                            <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                            </svg>
+                        @endif
+                    </div>
+
                     {{-- Product Info --}}
                     <label for="product_{{ $product->id }}" class="flex-1 cursor-pointer">
-                        <p class="text-sm font-medium text-slate-800 dark:text-slate-200">{{ $product->name }}</p>
-                        <p class="text-xs text-slate-400">{{ number_format($product->price, 2) }} MAD / unit</p>
+                        <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ $product->name }}</p>
+                        <p class="text-xs text-slate-400 font-medium">{{ number_format($product->price, 2) }} MAD / unit</p>
                     </label>
                     {{-- Quantity Input --}}
                     <div x-show="isSelected({{ $product->id }})" class="flex items-center gap-2">

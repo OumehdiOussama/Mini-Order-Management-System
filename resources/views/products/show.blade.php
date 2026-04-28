@@ -24,103 +24,46 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
     {{-- Main --}}
     <div class="lg:col-span-2 space-y-5">
 
-        {{-- Product Card --}}
+        {{-- Product Info Card --}}
         <div class="card overflow-hidden">
-            <div class="h-48 bg-gradient-to-br from-brand-50 to-violet-50 dark:from-slate-700 dark:to-slate-600 flex items-center justify-center">
-                <svg class="w-20 h-20 text-brand-200 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
-                </svg>
+            <div class="h-72 bg-slate-100 dark:bg-slate-700 flex items-center justify-center relative">
+                @if($product->image_path)
+                    <img src="{{ asset('storage/' . $product->image_path) }}" 
+                         alt="{{ $product->name }}" 
+                         class="w-full h-full object-cover">
+                @else
+                    <div class="flex flex-col items-center gap-3">
+                        <svg class="w-20 h-20 text-slate-300 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                        </svg>
+                        <span class="text-slate-400 text-xs font-medium">No image available</span>
+                    </div>
+                @endif
             </div>
-            <div class="p-5">
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">{{ $product->name }}</h2>
+            <div class="p-6">
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">{{ $product->name }}</h2>
                 <div class="flex items-center gap-3 flex-wrap">
-                    <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                    <span class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
                         {{ number_format($product->price, 2) }} MAD
                     </span>
                     <span class="badge-info">Per unit</span>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                <div class="grid grid-cols-2 gap-4 mt-6 pt-6  border-slate-100 dark:border-slate-700">
                     <div>
-                        <p class="text-xs text-slate-400">Added to catalog</p>
-                        <p class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ $product->created_at->format('M d, Y') }}</p>
+                        <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Added to catalog</p>
+                        <p class="text-sm font-medium text-slate-700 dark:text-slate-300 mt-1">{{ $product->created_at->format('M d, Y') }}</p>
                     </div>
                     <div>
-                        <p class="text-xs text-slate-400">Last updated</p>
-                        <p class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ $product->updated_at->format('M d, Y H:i') }}</p>
+                        <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Last updated</p>
+                        <p class="text-sm font-medium text-slate-700 dark:text-slate-300 mt-1">{{ $product->updated_at->format('M d, Y H:i') }}</p>
                     </div>
                 </div>
             </div>
-        </div>
-
-        {{-- Orders containing this product --}}
-        <div class="card overflow-hidden">
-            <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
-                <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                    In Orders ({{ $product->orders->count() }})
-                </h2>
-            </div>
-            @if($product->orders->isEmpty())
-            <div class="empty-state py-10">
-                <div class="empty-state-icon mx-auto">
-                    <svg class="w-6 h-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                    </svg>
-                </div>
-                <p class="empty-state-title">Not ordered yet</p>
-                <p class="empty-state-desc">This product hasn't been included in any orders</p>
-            </div>
-            @else
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Order</th>
-                        <th>Customer</th>
-                        <th>Qty</th>
-                        <th>Subtotal</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th class="text-right">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($product->orders as $order)
-                    <tr>
-                        <td>
-                            <a href="{{ route('orders.show', $order) }}"
-                               class="font-semibold text-brand-600 dark:text-brand-400 hover:underline">
-                                #{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{{ route('customers.show', $order->customer) }}"
-                               class="text-sm text-slate-700 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400">
-                                {{ $order->customer->name }}
-                            </a>
-                        </td>
-                        <td><span class="badge-default">× {{ $order->pivot->quantity }}</span></td>
-                        <td class="font-semibold text-slate-800 dark:text-slate-200">
-                            {{ number_format($product->price * $order->pivot->quantity, 2) }} MAD
-                        </td>
-                        <td>
-                            <span class="badge-{{ $order->status }}">
-                                <span class="w-1.5 h-1.5 rounded-full bg-current opacity-70"></span>
-                                {{ ucfirst($order->status) }}
-                            </span>
-                        </td>
-                        <td class="text-xs text-slate-400">{{ $order->created_at->format('M d, Y') }}</td>
-                        <td class="text-right">
-                            <a href="{{ route('orders.show', $order) }}" class="btn-ghost btn-sm">View</a>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            @endif
         </div>
     </div>
 
@@ -166,6 +109,78 @@
             </form>
         </div>
     </div>
+</div>
+
+{{-- Orders Table - Full Width Bottom --}}
+<div class="card overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+        <h2 class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">
+            Order History ({{ $product->orders->count() }})
+        </h2>
+    </div>
+    @if($product->orders->isEmpty())
+    <div class="empty-state py-12">
+        <div class="empty-state-icon mx-auto">
+            <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+            </svg>
+        </div>
+        <p class="empty-state-title">No orders yet</p>
+        <p class="empty-state-desc">This product hasn't been sold yet.</p>
+    </div>
+    @else
+    <div class="overflow-x-auto">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="pl-6">Order ID</th>
+                    <th>Customer</th>
+                    <th>Quantity</th>
+                    <th>Revenue (MAD)</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th class="text-right pr-6">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($product->orders as $order)
+                <tr class="group">
+                    <td class="pl-6">
+                        <a href="{{ route('orders.show', $order) }}"
+                           class="font-bold text-brand-600 dark:text-brand-400 hover:underline">
+                            #{{ str_pad($order->id, 5, '0', STR_PAD_LEFT) }}
+                        </a>
+                    </td>
+                    <td>
+                        <div class="flex items-center gap-3">
+                            <div class="avatar-sm" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                                {{ strtoupper(substr($order->customer->name, 0, 1)) }}
+                            </div>
+                            <a href="{{ route('customers.show', $order->customer) }}"
+                               class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-brand-600">
+                                {{ $order->customer->name }}
+                            </a>
+                        </div>
+                    </td>
+                    <td><span class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-xs font-bold">× {{ $order->pivot->quantity }}</span></td>
+                    <td class="font-bold text-slate-900 dark:text-white">
+                        {{ number_format($product->price * $order->pivot->quantity, 2) }}
+                    </td>
+                    <td>
+                        <span class="badge-{{ $order->status }}">
+                            {{ ucfirst($order->status) }}
+                        </span>
+                    </td>
+                    <td class="text-xs text-slate-500">{{ $order->created_at->format('M d, Y') }}</td>
+                    <td class="text-right pr-6">
+                        <a href="{{ route('orders.show', $order) }}" class="btn-ghost btn-sm">Details</a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
 </div>
 
 @endsection

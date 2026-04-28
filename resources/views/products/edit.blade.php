@@ -18,7 +18,7 @@
 
 <div class="max-w-2xl">
     <div class="card p-6">
-        <form method="POST" action="{{ route('products.update', $product) }}" class="space-y-5">
+        <form method="POST" action="{{ route('products.update', $product) }}" class="space-y-5" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -37,6 +37,25 @@
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium">MAD</span>
                 </div>
                 @error('price') <span class="input-error">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="image" class="input-label">Product Image</label>
+                
+                @if($product->image_path)
+                    <div class="mb-3 flex items-center gap-4">
+                        <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}" 
+                             class="w-24 h-24 object-cover rounded-lg border border-slate-200 dark:border-slate-700">
+                        <label class="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 cursor-pointer">
+                            <input type="checkbox" name="remove_image" value="1" class="rounded border-slate-300 dark:border-slate-600">
+                            Remove current photo
+                        </label>
+                    </div>
+                @endif
+
+                <input type="file" id="image" name="image" class="input-field py-2" accept="image/*">
+                <p class="mt-1.5 text-xs text-slate-500">Supported formats: JPG, PNG, GIF. Max 2MB. Leave empty to keep current image.</p>
+                @error('image') <span class="input-error">{{ $message }}</span> @enderror
             </div>
 
             <div class="flex gap-3 pt-2">

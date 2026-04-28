@@ -36,12 +36,18 @@ class ProductController extends Controller
     */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Product::create($request->all());
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $validated['image_path'] = $path;
+        }
+
+        Product::create($validated);
 
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
@@ -68,12 +74,29 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $product->update($request->all());
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($product->image_path && \Storage::disk('public')->exists($product->image_path)) {
+                \Storage::disk('public')->delete($product->image_path);
+            }
+            
+            $path = $request->file('image')->store('products', 'public');
+            $validated['image_path'] = $path;
+        } elseif ($request->boolean('remove_image')) {
+            // Remove image if requested
+            if ($product->image_path && \Storage::disk('public')->exists($product->image_path)) {
+                \Storage::disk('public')->delete($product->image_path);
+            }
+            $validated['image_path'] = null;
+        }
+
+        $product->update($validated);
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully!');
     }
