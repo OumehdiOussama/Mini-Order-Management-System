@@ -41,7 +41,7 @@
                     <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 leading-none">
                         {{ auth()->user()->name ?? 'User' }}
                     </p>
-                    <p class="text-xs text-slate-400 mt-0.5">Administrator</p>
+                    <p class="text-xs text-slate-400 mt-0.5">{{ ucfirst(auth()->user()->role) }}</p>
                 </div>
                 <svg class="w-4 h-4 text-slate-400 transition-transform duration-150"
                      :class="open ? 'rotate-180' : ''"

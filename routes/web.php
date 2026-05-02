@@ -35,11 +35,13 @@ Route::middleware("auth")->group(function(){
     Route::middleware('role:admin')->group(function () {
         Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
         Route::get('/customers/export', [CustomerController::class, 'export'])->name('customers.export');
+        Route::resource("customers", CustomerController::class)->except(['show']);
+        Route::resource("products", ProductController::class)->except(['index', 'show']);
     });
 
     Route::get("/dashboard", [DashboardController::class, "index"])->name("dashboard.index");
-    Route::resource("customers", CustomerController::class);
-    Route::resource("products", ProductController::class);
+    Route::resource("customers", CustomerController::class)->only(['show']);
+    Route::resource("products", ProductController::class)->only(['index', 'show']);
     Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
     Route::resource("orders", OrderController::class);
 
@@ -47,6 +49,8 @@ Route::middleware("auth")->group(function(){
     Route::put('/profile', UpdateProfileController::class);
     Route::post("/change-password", ChangePasswordController::class);
 
+    Route::post('/profile/notifications', \App\Http\Controllers\Auth\UpdateNotificationSettingsController::class)->name('profile.notifications.update');
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+    Route::delete('/products/bulk-destroy', [ProductController::class, 'bulkDestroy'])->name('products.bulkDestroy');
     Route::post('/logout', LogoutController::class)->name("logout");
 });

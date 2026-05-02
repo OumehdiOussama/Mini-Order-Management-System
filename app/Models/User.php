@@ -25,7 +25,8 @@ class User extends Authenticatable
         'password',
         "otp",
         "account_verified_at",
-        "role"
+        "role",
+        "notification_settings"
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable
         return [
             'account_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notification_settings' => 'array',
         ];
     }
 

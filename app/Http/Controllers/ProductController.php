@@ -12,6 +12,7 @@ class ProductController extends Controller
     */
     public function index(Request $request)
     {
+        \Illuminate\Support\Facades\Gate::authorize('viewAny', Product::class);
         $query = Product::query();
 
         if ($request->filled('search')) {
@@ -20,7 +21,7 @@ class ProductController extends Controller
 
         $products = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
         
-        return view('products.index', compact('products'));
+        return view('admin.products.index', compact('products'));
     }
 
     /*
@@ -28,7 +29,8 @@ class ProductController extends Controller
     */
     public function create()
     {
-        return view('products.create');
+        \Illuminate\Support\Facades\Gate::authorize('create', Product::class);
+        return view('admin.products.create');
     }
 
     /*
@@ -36,6 +38,7 @@ class ProductController extends Controller
     */
     public function store(Request $request)
     {
+        \Illuminate\Support\Facades\Gate::authorize('create', Product::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:1',
@@ -57,8 +60,9 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
+        \Illuminate\Support\Facades\Gate::authorize('view', $product);
         $product->load('orders');
-        return view('products.show', compact('product'));
+        return view('admin.products.show', compact('product'));
     }
 
     /*
@@ -66,7 +70,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        return view('products.edit', compact('product'));
+        \Illuminate\Support\Facades\Gate::authorize('update', $product);
+        return view('admin.products.edit', compact('product'));
     }
 
     /*
@@ -74,6 +79,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
+        \Illuminate\Support\Facades\Gate::authorize('update', $product);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:1',
@@ -106,7 +112,25 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        \Illuminate\Support\Facades\Gate::authorize('delete', $product);
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Product deleted!');
+    }
+
+    /**
+     * Delete multiple products from storage.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        \Illuminate\Support\Facades\Gate::authorize('delete', Product::class);
+        
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:products,id'
+        ]);
+
+        Product::whereIn('id', $validated['ids'])->delete();
+
+        return redirect()->route('products.index')->with('success', count($validated['ids']) . ' products deleted!');
     }
 }

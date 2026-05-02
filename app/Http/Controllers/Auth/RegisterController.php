@@ -19,7 +19,7 @@ class RegisterController extends Controller
             "email" => $request->email,
             "password" => Hash::make($request->password),
             "otp"=>rand(100000,999999),
-            "role" => "customer" // Ensure role is set
+            "role" => "customer"
         ]);
         
         event(new \App\Events\UserRegistered($user));

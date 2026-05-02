@@ -14,6 +14,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
+        \Illuminate\Support\Facades\Gate::authorize('viewAny', Order::class);
         $user = $request->user();
         $query = Order::with(['customer', 'products']);
 
@@ -42,7 +43,8 @@ class OrderController extends Controller
 
         $orders = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         
-        return view('orders.index', compact('orders'));
+        $viewPath = $user->role === 'customer' ? 'customer.orders.index' : 'admin.orders.index';
+        return view($viewPath, compact('orders'));
     }
 
     /*
@@ -50,9 +52,18 @@ class OrderController extends Controller
      */
     public function create()
     {
-        $customers = Customer::all();
+        \Illuminate\Support\Facades\Gate::authorize('create', Order::class);
+        
+        $user = auth()->user();
+        if ($user->role === 'customer') {
+            $customers = $user->customer ? collect([$user->customer]) : collect();
+        } else {
+            $customers = Customer::all();
+        }
+
         $products = Product::all();
-        return view('orders.create', compact('customers', 'products'));
+        $viewPath = $user->role === 'customer' ? 'customer.orders.create' : 'admin.orders.create';
+        return view($viewPath, compact('customers', 'products'));
     }
 
     /*
@@ -60,6 +71,16 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        \Illuminate\Support\Facades\Gate::authorize('create', Order::class);
+
+        // Force customer_id if user is a customer
+        if ($request->user()->role === 'customer') {
+            if (!$request->user()->customer) {
+                return redirect()->back()->with('error', 'You must have a customer profile to place orders.');
+            }
+            $request->merge(['customer_id' => $request->user()->customer->id]);
+        }
+
         // Validation
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
@@ -116,8 +137,10 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
+        \Illuminate\Support\Facades\Gate::authorize('view', $order);
         $order->load(['customer', 'products', 'timeline']);
-        return view('orders.show', compact('order'));
+        $viewPath = auth()->user()->role === 'customer' ? 'customer.orders.show' : 'admin.orders.show';
+        return view($viewPath, compact('order'));
     }
 
     /*
@@ -125,9 +148,10 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
+        \Illuminate\Support\Facades\Gate::authorize('update', $order);
         $order->load(['customer', 'products']);
         $statuses = $order->availableTransitionStatuses();
-        return view('orders.edit', compact('order', 'statuses'));
+        return view('admin.orders.edit', compact('order', 'statuses'));
     }
 
     /*
@@ -135,6 +159,7 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
+        \Illuminate\Support\Facades\Gate::authorize('update', $order);
         // Tracking data is required when an order is moved to shipped.
         $requireTracking = $request->input('status') === 'shipped';
 
@@ -187,6 +212,7 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
+        \Illuminate\Support\Facades\Gate::authorize('delete', $order);
         $order->delete();
         return redirect()->route('orders.index')->with('success', 'Order deleted successfully!');
     }

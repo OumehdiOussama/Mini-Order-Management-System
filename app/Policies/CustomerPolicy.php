@@ -32,7 +32,7 @@ class CustomerPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return in_array($user->role, ['admin', 'staff']);
     }
 
     /**
@@ -40,7 +40,10 @@ class CustomerPolicy
      */
     public function update(User $user, Customer $customer): bool
     {
-        return false;
+        if (in_array($user->role, ['admin', 'staff'])) {
+            return true;
+        }
+        return $customer->user_id === $user->id;
     }
 
     /**
@@ -48,22 +51,6 @@ class CustomerPolicy
      */
     public function delete(User $user, Customer $customer): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Customer $customer): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Customer $customer): bool
-    {
-        return false;
+        return $user->role === 'admin';
     }
 }

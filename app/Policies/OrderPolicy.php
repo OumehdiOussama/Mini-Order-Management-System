@@ -43,7 +43,7 @@ class OrderPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true; // Everyone can create orders
     }
 
     /**
@@ -51,6 +51,15 @@ class OrderPolicy
      */
     public function update(User $user, Order $order): bool
     {
+        if (in_array($user->role, ['admin', 'staff'])) {
+            return true;
+        }
+
+        // Customers can only update (cancel) their own orders if they are pending
+        if ($user->role === 'customer' && $order->customer && $order->customer->user_id === $user->id) {
+            return $order->status === 'pending';
+        }
+
         return false;
     }
 
@@ -59,22 +68,15 @@ class OrderPolicy
      */
     public function delete(User $user, Order $order): bool
     {
-        return false;
-    }
+        if ($user->role === 'admin') {
+            return true;
+        }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Order $order): bool
-    {
-        return false;
-    }
+        // Customers can delete their own orders if they are pending
+        if ($user->role === 'customer' && $order->customer && $order->customer->user_id === $user->id) {
+            return $order->status === 'pending';
+        }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Order $order): bool
-    {
         return false;
     }
 }

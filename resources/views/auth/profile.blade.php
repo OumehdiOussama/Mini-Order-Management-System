@@ -124,38 +124,64 @@
         </div>
 
         {{-- NOTIFICATIONS TAB --}}
-        <div x-show="tab === 'notifications'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="card p-6" style="display: none;">
+        <div x-show="tab === 'notifications'" 
+             x-data="{ 
+                settings: {{ json_encode(auth()->user()->notification_settings ?? ['email' => true, 'in_app' => true, 'sms' => false]) }},
+                async updateSetting(key) {
+                    this.settings[key] = !this.settings[key];
+                    try {
+                        const response = await fetch('{{ route('profile.notifications.update') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify(this.settings)
+                        });
+                        if (!response.ok) throw new Error('Failed to update');
+                    } catch (e) {
+                        console.error(e);
+                        this.settings[key] = !this.settings[key]; // Revert on failure
+                    }
+                }
+             }"
+             x-transition:enter="transition ease-out duration-300" 
+             x-transition:enter-start="opacity-0 translate-y-4" 
+             x-transition:enter-end="opacity-100 translate-y-0" 
+             class="card p-6" style="display: none;">
             <div class="mb-8">
                 <h2 class="text-lg font-bold text-slate-900 dark:text-white">Notification Settings</h2>
-                <p class="text-sm text-slate-400">Manage how you receive alerts and updates</p>
+                <p class="text-sm text-slate-400">Manage how you receive alerts and updates (Changes are saved automatically)</p>
             </div>
 
             <div class="space-y-4">
-                <div class="flex items-center justify-between p-4 border border-slate-100 dark:border-slate-800 rounded-xl">
+                <div @click="updateSetting('email')" class="flex items-center justify-between p-4 border border-slate-100 dark:border-slate-800 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200">
                     <div>
                         <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">Email Notifications</p>
                         <p class="text-xs text-slate-400">Receive order updates and reports via email</p>
                     </div>
-                    <div class="w-10 h-6 bg-brand-500 rounded-full relative cursor-pointer">
-                        <div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                    <div :class="settings.email ? 'bg-brand-500' : 'bg-slate-200 dark:bg-slate-700'" class="w-10 h-6 rounded-full relative transition-colors duration-200">
+                        <div :class="settings.email ? 'translate-x-4' : 'translate-x-0'" class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 shadow-sm"></div>
                     </div>
                 </div>
-                <div class="flex items-center justify-between p-4 border border-slate-100 dark:border-slate-800 rounded-xl">
+
+                <div @click="updateSetting('in_app')" class="flex items-center justify-between p-4 border border-slate-100 dark:border-slate-800 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200">
                     <div>
                         <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">In-App Alerts</p>
                         <p class="text-xs text-slate-400">Show notification bell indicator for new events</p>
                     </div>
-                    <div class="w-10 h-6 bg-brand-500 rounded-full relative cursor-pointer">
-                        <div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                    <div :class="settings.in_app ? 'bg-brand-500' : 'bg-slate-200 dark:bg-slate-700'" class="w-10 h-6 rounded-full relative transition-colors duration-200">
+                        <div :class="settings.in_app ? 'translate-x-4' : 'translate-x-0'" class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 shadow-sm"></div>
                     </div>
                 </div>
-                <div class="flex items-center justify-between p-4 border border-slate-100 dark:border-slate-800 rounded-xl">
+
+                <div @click="updateSetting('sms')" class="flex items-center justify-between p-4 border border-slate-100 dark:border-slate-800 rounded-xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200">
                     <div>
                         <p class="text-sm font-semibold text-slate-700 dark:text-slate-200">SMS Notifications</p>
                         <p class="text-xs text-slate-400">Receive urgent alerts on your mobile phone</p>
                     </div>
-                    <div class="w-10 h-6 bg-slate-200 dark:bg-slate-700 rounded-full relative cursor-pointer">
-                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                    <div :class="settings.sms ? 'bg-brand-500' : 'bg-slate-200 dark:bg-slate-700'" class="w-10 h-6 rounded-full relative transition-colors duration-200">
+                        <div :class="settings.sms ? 'translate-x-4' : 'translate-x-0'" class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 shadow-sm"></div>
                     </div>
                 </div>
             </div>

@@ -9,6 +9,7 @@ use Database\Seeders\OrderTimelineSeeder;
 use Database\Seeders\ProductSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,11 +20,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a test user
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::updateOrCreate(
+            ['email' => env("ADMIN_EMAIL")],
+            [
+                'name' => "OUSSAMA OUMEHDI",
+                'password' => Hash::make(env("ADMIN_PASSWOPRD")),
+                'role' => "admin",
+                'account_verified_at' => now(),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => Hash::make('password'),
+                'role' => 'customer',
+                'account_verified_at' => now(),
+            ]
+        );
 
         // Seed demo data
         $this->call([

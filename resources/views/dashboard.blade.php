@@ -55,12 +55,6 @@
         </div>
         <div>
             <p class="stat-label">Total Revenue</p>
-            @php
-                $totalRevenue = \App\Models\Order::with('products')
-                    ->where('status', '!=', 'cancelled')
-                    ->get()
-                    ->sum(fn($o) => $o->getTotalPrice());
-            @endphp
             <p class="stat-value text-emerald-600 dark:text-emerald-400">
                 {{ number_format($totalRevenue, 0) }}
                 <span class="text-sm font-medium ml-0.5">MAD</span>
@@ -94,13 +88,6 @@
         </div>
         <div>
             <p class="stat-label">Total Spent</p>
-            @php
-                $totalSpent = \App\Models\Order::with('products')
-                    ->where('customer_id', auth()->user()->customer?->id ?? -1)
-                    ->where('status', '!=', 'cancelled')
-                    ->get()
-                    ->sum(fn($o) => $o->getTotalPrice());
-            @endphp
             <p class="stat-value text-emerald-600 dark:text-emerald-400">
                 {{ number_format($totalSpent, 0) }}
                 <span class="text-sm font-medium ml-0.5">MAD</span>
@@ -282,17 +269,6 @@
     const isDark = document.documentElement.classList.contains('dark');
     const gridColor  = isDark ? 'rgba(51,65,85,0.6)' : 'rgba(226,232,240,0.8)';
     const textColor  = isDark ? '#94a3b8' : '#64748b';
-
-    // ── Orders last 7 days (line chart) ──────────────────
-    @php
-        $last7Days = collect(range(6, 0))->map(fn($d) => now()->subDays($d));
-        if (auth()->user()->role === 'customer') {
-            $ordersPerDay = $last7Days->map(fn($day) => \App\Models\Order::where('customer_id', auth()->user()->customer?->id ?? -1)->whereDate('created_at', $day)->count());
-        } else {
-            $ordersPerDay = $last7Days->map(fn($day) => \App\Models\Order::whereDate('created_at', $day)->count());
-        }
-        $dayLabels    = $last7Days->map(fn($day) => $day->format('D'));
-    @endphp
 
     const lineCtx = document.getElementById('ordersLineChart');
     if (lineCtx) {

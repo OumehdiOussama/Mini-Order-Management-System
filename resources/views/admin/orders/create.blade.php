@@ -31,15 +31,23 @@
                 Customer
             </h2>
             <div class="form-group">
-                <label for="customer_id" class="input-label">Select Customer <span class="text-red-500">*</span></label>
-                <select name="customer_id" id="customer_id" class="select-field" required>
-                    <option value="">Choose a customer…</option>
-                    @foreach($customers as $customer)
-                    <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
-                        {{ $customer->name }} — {{ $customer->email }}
-                    </option>
-                    @endforeach
-                </select>
+                @if(auth()->user()->role === 'customer')
+                    <label class="input-label">Customer Name</label>
+                    <div class="input-field bg-slate-50 dark:bg-slate-900/50 cursor-not-allowed">
+                        {{ auth()->user()->name }} — {{ auth()->user()->email }}
+                    </div>
+                    <input type="hidden" name="customer_id" value="{{ auth()->user()->customer?->id }}">
+                @else
+                    <label for="customer_id" class="input-label">Select Customer <span class="text-red-500">*</span></label>
+                    <select name="customer_id" id="customer_id" class="select-field" required>
+                        <option value="">Choose a customer…</option>
+                        @foreach($customers as $customer)
+                        <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
+                            {{ $customer->name }} — {{ $customer->email }}
+                        </option>
+                        @endforeach
+                    </select>
+                @endif
                 @error('customer_id')
                     <span class="input-error">{{ $message }}</span>
                 @enderror

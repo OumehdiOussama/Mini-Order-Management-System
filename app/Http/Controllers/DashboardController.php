@@ -13,43 +13,80 @@ class DashboardController extends Controller
     public function index(\Illuminate\Http\Request $request)
     {
         $user = $request->user();
-
-        // Customer Dashboard
-        if ($user->role === 'customer') {
-            $customer = $user->customer;
-            
-            $totalOrders = $customer ? $customer->orders()->count() : 0;
-            $ordersByStatus = [
-                'pending' => $customer ? $customer->orders()->where('status', 'pending')->count() : 0,
-                'processing' => $customer ? $customer->orders()->where('status', 'processing')->count() : 0,
-                'shipped' => $customer ? $customer->orders()->where('status', 'shipped')->count() : 0,
-                'delivered' => $customer ? $customer->orders()->where('status', 'delivered')->count() : 0,
-                'cancelled' => $customer ? $customer->orders()->where('status', 'cancelled')->count() : 0,
-            ];
-            $recentOrders = $customer ? $customer->orders()->with(['products'])->orderBy('created_at', 'desc')->limit(5)->get() : collect();
-            
-            return view('dashboard', compact('totalOrders', 'ordersByStatus', 'recentOrders'));
-        }
-
-        // Admin and Staff Dashboard
-        $totalOrders = Order::count();
+        $isCustomer = $user->role === 'customer';
+        $customerId = $isCustomer ? ($user->customer->id ?? -1) : null;
 
         $ordersByStatus = [
-            'pending' => Order::where('status', 'pending')->count(),
-            'processing' => Order::where('status', 'processing')->count(),
-            'shipped' => Order::where('status', 'shipped')->count(),
-            'delivered' => Order::where('status', 'delivered')->count(),
-            'cancelled' => Order::where('status', 'cancelled')->count(),
+            'pending' => 0,
+            'processing' => 0,
+            'shipped' => 0,
+            'delivered' => 0,
+            'cancelled' => 0,
         ];
 
-        $recentOrders = Order::with(['customer', 'products'])
-                            ->orderBy('created_at', 'desc')
-                            ->limit(5)
-                            ->get();
+        // Optimize Status Counts
+        $statusQuery = Order::query();
+        if ($isCustomer) {
+            $statusQuery->where('customer_id', $customerId);
+        }
+        
+        $statusCounts = $statusQuery->selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+        
+        foreach ($statusCounts as $status => $count) {
+            if (isset($ordersByStatus[$status])) {
+                $ordersByStatus[$status] = $count;
+            }
+        }
+
+        $totalOrders = array_sum($ordersByStatus);
+
+        // Recent Orders with Eager Loading
+        $recentOrdersQuery = Order::with(['customer', 'products']);
+        if ($isCustomer) {
+            $recentOrdersQuery->where('customer_id', $customerId);
+        }
+        $recentOrders = $recentOrdersQuery->orderBy('created_at', 'desc')->limit(5)->get();
+
+        // Chart Data (Last 7 Days) - Optimized
+        $last7Days = collect(range(6, 0))->map(fn($d) => now()->subDays($d));
+        $dayLabels = $last7Days->map(fn($day) => $day->format('D'));
+        
+        $chartDataQuery = Order::query();
+        if ($isCustomer) {
+            $chartDataQuery->where('customer_id', $customerId);
+        }
+        
+        $ordersPerDayRaw = $chartDataQuery->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->selectRaw('DATE(created_at) as date, count(*) as count')
+            ->groupBy('date')
+            ->pluck('count', 'date');
+
+        $ordersPerDay = $last7Days->map(function($day) use ($ordersPerDayRaw) {
+            return $ordersPerDayRaw->get($day->format('Y-m-d'), 0);
+        });
+
+        if ($isCustomer) {
+            $totalSpent = \Illuminate\Support\Facades\DB::table('order_product')
+                ->join('orders', 'order_product.order_id', '=', 'orders.id')
+                ->join('products', 'order_product.product_id', '=', 'products.id')
+                ->where('orders.customer_id', $customerId)
+                ->where('orders.status', '!=', 'cancelled')
+                ->sum(\Illuminate\Support\Facades\DB::raw('order_product.quantity * products.price'));
+
+            return view('dashboard', compact('totalOrders', 'ordersByStatus', 'recentOrders', 'totalSpent', 'dayLabels', 'ordersPerDay'));
+        }
 
         $totalCustomers = Customer::count();
         $totalProducts = Product::count();
 
-        return view('dashboard', compact('totalOrders', 'ordersByStatus', 'recentOrders', 'totalCustomers', 'totalProducts'));
+        $totalRevenue = \Illuminate\Support\Facades\DB::table('order_product')
+            ->join('orders', 'order_product.order_id', '=', 'orders.id')
+            ->join('products', 'order_product.product_id', '=', 'products.id')
+            ->where('orders.status', '!=', 'cancelled')
+            ->sum(\Illuminate\Support\Facades\DB::raw('order_product.quantity * products.price'));
+
+        return view('dashboard', compact('totalOrders', 'ordersByStatus', 'recentOrders', 'totalCustomers', 'totalProducts', 'totalRevenue', 'dayLabels', 'ordersPerDay'));
     }
 }

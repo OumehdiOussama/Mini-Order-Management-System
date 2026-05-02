@@ -12,7 +12,7 @@
                       d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
         </div>
-        <span class="text-slate-800 font-bold text-lg">OrderFlow</span>
+        <span class="text-slate-800 font-bold text-lg">OMS</span>
     </div>
 
     <div class="mb-7">
