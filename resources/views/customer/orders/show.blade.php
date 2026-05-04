@@ -38,7 +38,24 @@
         </span>
     </div>
     <div class="flex gap-2">
-        {{-- Actions reserved for admin --}}
+        @if($order->status === 'pending')
+        <form method="POST" action="{{ route('orders.update', $order) }}"
+              id="cancel-order-form-header">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="status" value="cancelled">
+            <input type="hidden" name="notes" value="Order cancelled by customer.">
+            <button type="button"
+                    onclick="confirmCancel()"
+                    class="btn-danger">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                          d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Cancel Order
+            </button>
+        </form>
+        @endif
     </div>
 </div>
 
@@ -121,7 +138,6 @@
                         <p class="text-sm font-medium text-slate-800 dark:text-slate-200">{{ $order->customer->phone }}</p>
                     </div>
                 </div>
-                </div>
             </div>
         </div>
 
@@ -148,8 +164,8 @@
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0 overflow-hidden">
                                     @if($product->image_path)
-                                        <img src="{{ asset('storage/' . $product->image_path) }}" 
-                                             alt="{{ $product->name }}" 
+                                        <img src="{{ asset('storage/' . $product->image_path) }}"
+                                             alt="{{ $product->name }}"
                                              class="w-full h-full object-cover">
                                     @else
                                         <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -265,7 +281,86 @@
             @endforelse
         </div>
 
+        {{-- Cancel Order (only if pending) --}}
+        @if($order->status === 'pending')
+        <div class="card p-4 space-y-2">
+            <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Actions</h2>
+            <form method="POST" action="{{ route('orders.update', $order) }}" id="cancel-order-form">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="status" value="cancelled">
+                <input type="hidden" name="notes" value="Order cancelled by customer.">
+                <button type="button"
+                        onclick="confirmCancel()"
+                        class="btn-danger w-full justify-center">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                              d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Cancel Order
+                </button>
+            </form>
+        </div>
+        @endif
+
     </div>
 </div>
+
+{{-- Cancel Confirmation Dialog --}}
+<div id="cancel-modal"
+     class="fixed inset-0 z-50 hidden items-center justify-center p-4"
+     style="background:rgba(0,0,0,0.5)">
+    <div class="card p-6 max-w-sm w-full shadow-2xl">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100">Cancel this order?</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">This action cannot be undone.</p>
+            </div>
+        </div>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mb-5">
+            Are you sure you want to cancel <span class="font-semibold">Order #{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}</span>?
+            Once cancelled, you will need to place a new order.
+        </p>
+        <div class="flex gap-3">
+            <button type="button"
+                    onclick="closeModal()"
+                    class="btn-secondary flex-1 justify-center">
+                Keep Order
+            </button>
+            <button type="button"
+                    onclick="submitCancel()"
+                    class="btn-danger flex-1 justify-center">
+                Yes, Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmCancel() {
+    const modal = document.getElementById('cancel-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+function closeModal() {
+    const modal = document.getElementById('cancel-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+function submitCancel() {
+    const form = document.getElementById('cancel-order-form') || document.getElementById('cancel-order-form-header');
+    if (form) form.submit();
+}
+// Close on backdrop click
+document.getElementById('cancel-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+</script>
 
 @endsection

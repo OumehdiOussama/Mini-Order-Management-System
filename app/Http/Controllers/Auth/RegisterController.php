@@ -8,6 +8,7 @@ use App\Mail\VerifyAccountMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Events\UserRegistered;
 
 class RegisterController extends Controller
 {
@@ -22,7 +23,7 @@ class RegisterController extends Controller
             "role" => "customer"
         ]);
         
-        event(new \App\Events\UserRegistered($user));
+        event(new UserRegistered($user));
 
         Mail::to($user->email)->send(new VerifyAccountMail($user->otp, $user->email));
         
