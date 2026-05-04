@@ -46,4 +46,11 @@ class ProductPolicy
     {
         return in_array($user->role, ['admin', 'staff']);
     }
+    /**
+     * Determine whether the user can delete any models (bulk delete).
+     */
+    public function deleteAny(User $user): bool
+    {
+        return in_array($user->role, ['admin', 'staff']);
+    }
 }

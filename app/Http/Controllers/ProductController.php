@@ -122,7 +122,7 @@ class ProductController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
-        \Illuminate\Support\Facades\Gate::authorize('delete', Product::class);
+        \Illuminate\Support\Facades\Gate::authorize('deleteAny', Product::class);
         
         $validated = $request->validate([
             'ids' => 'required|array',

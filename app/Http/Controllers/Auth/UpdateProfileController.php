@@ -13,6 +13,15 @@ class UpdateProfileController extends Controller
     {
         $user = User::find(Auth::id());
         $user->update($request->validated());
+
+        if ($user->role === 'customer' && $user->customer) {
+            $user->customer->update([
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+            ]);
+        }
+
         return redirect()->route('profile')->with('success', 'Profile updated successfully');
     }
 }

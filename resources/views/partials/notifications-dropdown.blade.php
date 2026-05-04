@@ -35,6 +35,22 @@
                 this.unreadCount = 0;
             } catch(e) {}
         },
+        async markRead(id) {
+            try {
+                await fetch(`/notifications/${id}/mark-read`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                        'Accept': 'application/json',
+                    }
+                });
+                const notif = this.notifications.find(n => n.id === id);
+                if (notif && !notif.read_at) {
+                    notif.read_at = new Date().toISOString();
+                    this.unreadCount = Math.max(0, this.unreadCount - 1);
+                }
+            } catch(e) {}
+        },
         timeAgo(dateStr) {
             const now = new Date(), d = new Date(dateStr);
             const diff = Math.floor((now - d) / 1000);
@@ -101,7 +117,7 @@
             </template>
 
             <template x-for="notif in notifications" :key="notif.id">
-                <div class="flex gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors border-b border-slate-50 dark:border-slate-700/50 cursor-pointer"
+                <div @click="markRead(notif.id)" class="flex gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors border-b border-slate-50 dark:border-slate-700/50 cursor-pointer"
                      :class="!notif.read_at ? 'bg-brand-50/50 dark:bg-brand-900/10' : ''">
                     {{-- Type Icon --}}
                     <div class="shrink-0 mt-0.5">

@@ -36,6 +36,7 @@ Route::middleware("auth")->group(function(){
         Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
         Route::get('/customers/export', [CustomerController::class, 'export'])->name('customers.export');
         Route::resource("customers", CustomerController::class)->except(['show']);
+        Route::delete('/products/bulk-destroy', [ProductController::class, 'bulkDestroy'])->name('products.bulkDestroy');
         Route::resource("products", ProductController::class)->except(['index', 'show']);
     });
 
@@ -51,6 +52,6 @@ Route::middleware("auth")->group(function(){
 
     Route::post('/profile/notifications', \App\Http\Controllers\Auth\UpdateNotificationSettingsController::class)->name('profile.notifications.update');
     Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
-    Route::delete('/products/bulk-destroy', [ProductController::class, 'bulkDestroy'])->name('products.bulkDestroy');
+    Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markRead'])->name('notifications.markRead');
     Route::post('/logout', LogoutController::class)->name("logout");
 });

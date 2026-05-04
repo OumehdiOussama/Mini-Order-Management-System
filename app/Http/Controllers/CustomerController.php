@@ -16,7 +16,7 @@ class CustomerController extends Controller
         $query = Customer::query();
         
         // Search customers by name or email
-        if ($request->has('search') && $request->search != '') {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%");
@@ -41,13 +41,13 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         \Illuminate\Support\Facades\Gate::authorize('create', Customer::class);
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:customers,email',
             'phone' => 'required|string|max:20',
         ]);
 
-        Customer::create($request->all());
+        Customer::create($validated);
 
         return redirect()->route('customers.index')->with('success', 'Customer created successfully!');
     }
@@ -77,13 +77,13 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer)
     {
         \Illuminate\Support\Facades\Gate::authorize('update', $customer);
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:customers,email,'.$customer->id,
             'phone' => 'required|string|max:20',
         ]);
 
-        $customer->update($request->all());
+        $customer->update($validated);
 
         return redirect()->route('customers.index')->with('success', 'Customer updated successfully!');
     }

@@ -79,7 +79,7 @@
                     </div>
                     <div class="form-group">
                         <label class="input-label">Role</label>
-                        <input type="text" value="Administrator" class="input-field bg-slate-50 dark:bg-slate-800/50 text-slate-400" disabled>
+                        <input type="text" value="{{ ucfirst(auth()->user()->role) }}" class="input-field bg-slate-50 dark:bg-slate-800/50 text-slate-400" disabled>
                     </div>
                 </div>
 

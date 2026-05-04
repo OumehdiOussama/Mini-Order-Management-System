@@ -95,7 +95,7 @@
                             #{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}
                         </a>
                     </td>
-                    <td>
+                    
                     <td>
                         <span class="badge-default">{{ $order->products->count() }} items</span>
                     </td>

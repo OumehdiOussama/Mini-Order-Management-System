@@ -106,22 +106,27 @@ class OrderController extends Controller
             }
         }
 
-        // Create order with pending status
-        $order = Order::create([
-            'customer_id' => $request->customer_id,
-            'status' => 'pending',
-        ]);
+        // Use a database transaction to ensure order and its related data are created atomically
+        $order = \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            // Create order with pending status
+            $order = Order::create([
+                'customer_id' => $request->customer_id,
+                'status' => 'pending',
+            ]);
 
-        // Attach products with quantity
-        foreach ($request->products as $productId) {
-            $quantity = (int) $request->quantities[$productId];
-            $order->products()->attach($productId, ['quantity' => $quantity]);
-        }
+            // Attach products with quantity
+            foreach ($request->products as $productId) {
+                $quantity = (int) $request->quantities[$productId];
+                $order->products()->attach($productId, ['quantity' => $quantity]);
+            }
 
-        // Add initial timeline entry
-        $order->addTimeline('pending', 'Order created');
+            // Add initial timeline entry
+            $order->addTimeline('pending', 'Order created');
 
-        // Trigger Notifications
+            return $order;
+        });
+
+        // Trigger Notifications outside transaction
         $adminsAndStaff = \App\Models\User::whereIn('role', ['admin', 'staff'])->get();
         \Illuminate\Support\Facades\Notification::send($adminsAndStaff, new \App\Notifications\NewOrderCreated($order));
 
@@ -184,6 +189,8 @@ class OrderController extends Controller
         $trackingNumber = $request->status === 'shipped' ? $request->tracking_number : $order->tracking_number;
         $carrier = $request->status === 'shipped' ? $request->carrier : $order->carrier;
 
+        $statusChanged = $order->status !== $request->status;
+
         // Update order
         $order->update([
             'status' => $request->status,
@@ -191,13 +198,15 @@ class OrderController extends Controller
             'carrier' => $carrier,
         ]);
 
-        // Add timeline entry
-        $order->addTimeline(
-            $request->status,
-            $request->notes,
-            $trackingNumber,
-            $carrier
-        );
+        // Add timeline entry only when status actually changes
+        if ($statusChanged) {
+            $order->addTimeline(
+                $request->status,
+                $request->notes,
+                $trackingNumber,
+                $carrier
+            );
+        }
 
         // Trigger Notification
         if ($order->customer && $order->customer->user) {
