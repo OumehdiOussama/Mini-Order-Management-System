@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     public const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 

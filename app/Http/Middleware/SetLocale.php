@@ -4,19 +4,21 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
-class RoleMiddleware
+class SetLocale
 {
     /**
      * Handle an incoming request.
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || ! in_array($request->user()->role, $roles)) {
-            abort(403, 'Unauthorized action.');
+        if (Session::has('locale')) {
+            App::setLocale(Session::get('locale'));
         }
 
         return $next($request);

@@ -15,9 +15,16 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::view("/","auth.login");
+Route::view("/", "welcome")->name('home');
 Route::view('/login', 'auth.login')->name('login');
 Route::view("/register","auth.register")->name("register");
+
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'fr', 'ar'])) {
+        session()->put('locale', $locale);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 Route::post("/register",RegisterController::class);
 Route::post('/login', LoginController::class);
@@ -32,7 +39,7 @@ Route::view("/verify-account/{identifier}","auth.verify-account")->name("account
 Route::post("/verify-account",VerifyAccountController::class);
 
 Route::middleware("auth")->group(function(){
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:admin,staff')->group(function () {
         Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');
         Route::get('/customers/export', [CustomerController::class, 'export'])->name('customers.export');
         Route::resource("customers", CustomerController::class)->except(['show']);

@@ -176,6 +176,62 @@
     </div>
 </div>
 
+{{-- ══════════ TOP PRODUCTS & ACTIVITY ══════════ --}}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-7">
+    
+    {{-- Top Products --}}
+    <div class="card p-5">
+        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4 uppercase tracking-wider">Top Selling Products</h3>
+        @if(isset($topProducts) && $topProducts->count() > 0)
+            <div class="space-y-4">
+                @foreach($topProducts as $product)
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+                                @if($product->image_path)
+                                    <img src="{{ asset('storage/' . $product->image_path) }}" class="w-full h-full object-cover">
+                                @else
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                @endif
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-800 dark:text-slate-200">{{ $product->name }}</p>
+                                <p class="text-xs text-slate-400">{{ number_format($product->price, 2) }} MAD</p>
+                            </div>
+                        </div>
+                        <span class="badge-info">{{ $product->total_sold }} sold</span>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-sm text-slate-400">No sales data yet.</p>
+        @endif
+    </div>
+
+    {{-- Recent Activity --}}
+    <div class="card p-5">
+        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-4 uppercase tracking-wider">Recent Activity</h3>
+        @if(isset($recentActivity) && $recentActivity->count() > 0)
+            <div class="space-y-4">
+                @foreach($recentActivity as $log)
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-1.5 rounded-full {{ $log->action == 'created' ? 'bg-emerald-500' : ($log->action == 'deleted' ? 'bg-red-500' : 'bg-blue-500') }}"></div>
+                        <div>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">
+                                <span class="font-bold">{{ $log->user->name ?? 'System' }}</span> 
+                                {{ $log->description }}
+                            </p>
+                            <p class="text-[10px] text-slate-400 mt-0.5">{{ $log->created_at->diffForHumans() }} · IP: {{ $log->ip_address }}</p>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-sm text-slate-400">No recent activity.</p>
+        @endif
+    </div>
+</div>
+
 {{-- ══════════ RECENT ORDERS TABLE ══════════ --}}
 <div class="card overflow-hidden">
     <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-700">

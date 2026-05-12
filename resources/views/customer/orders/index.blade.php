@@ -78,12 +78,12 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Order</th>
-                    <th>Items</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th class="text-right">Actions</th>
+                    <th class="w-[15%]">Order</th>
+                    <th class="w-[15%]">Items</th>
+                    <th class="w-[20%]">Total</th>
+                    <th class="w-[20%]">Status</th>
+                    <th class="w-[20%]">Date</th>
+                    <th class="text-right w-[10%]">Actions</th>
                 </tr>
             </thead>
             <tbody>

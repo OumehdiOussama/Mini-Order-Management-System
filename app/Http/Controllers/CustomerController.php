@@ -2,17 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Requests\UpdateCustomerRequest;
 use App\Models\Customer;
+use App\Services\CustomerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CustomerController extends Controller
 {
+    protected CustomerService $customerService;
+
+    public function __construct(CustomerService $customerService)
+    {
+        $this->customerService = $customerService;
+    }
+
     /**
      * Display a list of all customers with search functionality.
      */
     public function index(Request $request)
     {
-        \Illuminate\Support\Facades\Gate::authorize('viewAny', Customer::class);
+        Gate::authorize('viewAny', Customer::class);
         $query = Customer::query();
         
         // Search customers by name or email
@@ -31,23 +42,18 @@ class CustomerController extends Controller
      */
     public function create()
     {
-        \Illuminate\Support\Facades\Gate::authorize('create', Customer::class);
+        Gate::authorize('create', Customer::class);
         return view('admin.customers.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCustomerRequest $request)
     {
-        \Illuminate\Support\Facades\Gate::authorize('create', Customer::class);
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email',
-            'phone' => 'required|string|max:20',
-        ]);
-
-        Customer::create($validated);
+        Gate::authorize('create', Customer::class);
+        
+        $this->customerService->createCustomer($request->validated());
 
         return redirect()->route('customers.index')->with('success', 'Customer created successfully!');
     }
@@ -57,7 +63,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        \Illuminate\Support\Facades\Gate::authorize('view', $customer);
+        Gate::authorize('view', $customer);
         $customer->load('orders');
         return view('admin.customers.show', compact('customer'));
     }
@@ -67,23 +73,18 @@ class CustomerController extends Controller
      */
     public function edit(Customer $customer)
     {
-        \Illuminate\Support\Facades\Gate::authorize('update', $customer);
+        Gate::authorize('update', $customer);
         return view('admin.customers.edit', compact('customer'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Customer $customer)
+    public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        \Illuminate\Support\Facades\Gate::authorize('update', $customer);
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email,'.$customer->id,
-            'phone' => 'required|string|max:20',
-        ]);
-
-        $customer->update($validated);
+        Gate::authorize('update', $customer);
+        
+        $this->customerService->updateCustomer($customer, $request->validated());
 
         return redirect()->route('customers.index')->with('success', 'Customer updated successfully!');
     }
@@ -93,8 +94,8 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        \Illuminate\Support\Facades\Gate::authorize('delete', $customer);
-        $customer->delete();
+        Gate::authorize('delete', $customer);
+        $this->customerService->deleteCustomer($customer);
         return redirect()->route('customers.index')->with('success', 'Customer deleted!');
     }
 

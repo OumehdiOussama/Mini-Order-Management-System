@@ -2,17 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
+    protected ProductService $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
     /*
      * Display a listing of all products.
     */
     public function index(Request $request)
     {
-        \Illuminate\Support\Facades\Gate::authorize('viewAny', Product::class);
+        Gate::authorize('viewAny', Product::class);
         $query = Product::query();
 
         if ($request->filled('search')) {
@@ -29,28 +40,18 @@ class ProductController extends Controller
     */
     public function create()
     {
-        \Illuminate\Support\Facades\Gate::authorize('create', Product::class);
+        Gate::authorize('create', Product::class);
         return view('admin.products.create');
     }
 
     /*
      * Store a newly created resource in storage.
     */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        \Illuminate\Support\Facades\Gate::authorize('create', Product::class);
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
-            $validated['image_path'] = $path;
-        }
-
-        Product::create($validated);
+        Gate::authorize('create', Product::class);
+        
+        $this->productService->createProduct($request->validated());
 
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
@@ -60,7 +61,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        \Illuminate\Support\Facades\Gate::authorize('view', $product);
+        Gate::authorize('view', $product);
         $product->load('orders');
         return view('admin.products.show', compact('product'));
     }
@@ -70,39 +71,18 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        \Illuminate\Support\Facades\Gate::authorize('update', $product);
+        Gate::authorize('update', $product);
         return view('admin.products.edit', compact('product'));
     }
 
     /*
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        \Illuminate\Support\Facades\Gate::authorize('update', $product);
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:1',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($product->image_path && \Storage::disk('public')->exists($product->image_path)) {
-                \Storage::disk('public')->delete($product->image_path);
-            }
-            
-            $path = $request->file('image')->store('products', 'public');
-            $validated['image_path'] = $path;
-        } elseif ($request->boolean('remove_image')) {
-            // Remove image if requested
-            if ($product->image_path && \Storage::disk('public')->exists($product->image_path)) {
-                \Storage::disk('public')->delete($product->image_path);
-            }
-            $validated['image_path'] = null;
-        }
-
-        $product->update($validated);
+        Gate::authorize('update', $product);
+        
+        $this->productService->updateProduct($product, $request->validated());
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully!');
     }
@@ -112,8 +92,8 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        \Illuminate\Support\Facades\Gate::authorize('delete', $product);
-        $product->delete();
+        Gate::authorize('delete', $product);
+        $this->productService->deleteProduct($product);
         return redirect()->route('products.index')->with('success', 'Product deleted!');
     }
 
@@ -122,14 +102,14 @@ class ProductController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
-        \Illuminate\Support\Facades\Gate::authorize('deleteAny', Product::class);
+        Gate::authorize('deleteAny', Product::class);
         
         $validated = $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:products,id'
         ]);
 
-        Product::whereIn('id', $validated['ids'])->delete();
+        $this->productService->bulkDelete($validated['ids']);
 
         return redirect()->route('products.index')->with('success', count($validated['ids']) . ' products deleted!');
     }

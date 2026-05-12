@@ -87,6 +87,32 @@ class DashboardController extends Controller
             ->where('orders.status', '!=', 'cancelled')
             ->sum(\Illuminate\Support\Facades\DB::raw('order_product.quantity * products.price'));
 
-        return view('dashboard', compact('totalOrders', 'ordersByStatus', 'recentOrders', 'totalCustomers', 'totalProducts', 'totalRevenue', 'dayLabels', 'ordersPerDay'));
+        // Top Selling Products
+        $topProducts = Product::select('products.*')
+            ->selectRaw('SUM(order_product.quantity) as total_sold')
+            ->join('order_product', 'products.id', '=', 'order_product.product_id')
+            ->groupBy('products.id')
+            ->orderBy('total_sold', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Recent Activity Logs
+        $recentActivity = \App\Models\ActivityLog::with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit(8)
+            ->get();
+
+        return view('dashboard', compact(
+            'totalOrders', 
+            'ordersByStatus', 
+            'recentOrders', 
+            'totalCustomers', 
+            'totalProducts', 
+            'totalRevenue', 
+            'dayLabels', 
+            'ordersPerDay',
+            'topProducts',
+            'recentActivity'
+        ));
     }
 }
