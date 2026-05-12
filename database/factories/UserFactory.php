@@ -7,12 +7,18 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends Factory<User>
- */
 class UserFactory extends Factory
 {
     protected static ?string $password;
+
+    protected $faker;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->faker = \Faker\Factory::create('fr_FR');
+    }
 
     public function definition(): array
     {

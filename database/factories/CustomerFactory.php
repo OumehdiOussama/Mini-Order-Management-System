@@ -1,18 +1,21 @@
 <?php
 
 namespace Database\Factories;
+
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Customer>
- */
 class CustomerFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $faker;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->faker = \Faker\Factory::create('fr_FR');
+    }
+
     public function definition(): array
     {
         return [
@@ -20,9 +23,8 @@ class CustomerFactory extends Factory
 
             'email' => $this->faker->unique()->safeEmail(),
 
-            // Moroccan phone numbers
-            'phone' => $this->faker->randomElement(['06', '07']) .
-                    $this->faker->numerify('########'),
+            'phone' => $this->faker->randomElement(['06','07']) .
+                       $this->faker->numerify('########'),
         ];
     }
 }

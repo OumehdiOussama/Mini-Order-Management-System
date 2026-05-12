@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class OrderFactory extends Factory
 {
+    protected $faker;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->faker = \Faker\Factory::create('fr_FR');
+    }
+
     public function definition(): array
     {
         $status = $this->faker->randomElement([
