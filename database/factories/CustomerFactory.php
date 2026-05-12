@@ -1,7 +1,6 @@
 <?php
 
 namespace Database\Factories;
-$faker = \Faker\Factory::create('fr_FR');
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
