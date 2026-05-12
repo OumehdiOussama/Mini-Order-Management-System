@@ -33,10 +33,16 @@
         <div x-data="{ open: false }" class="relative">
             <button @click="open = !open"
                     class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-150 focus:outline-none focus:ring-0">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white shrink-0"
-                     style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
-                </div>
+                @if(auth()->user()->photo)
+                    <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
+                         alt="{{ auth()->user()->name }}" 
+                         class="w-8 h-8 rounded-lg object-cover border border-slate-200 dark:border-slate-700">
+                @else
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold text-white shrink-0"
+                         style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                        {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
+                    </div>
+                @endif
                 <div class="hidden sm:block text-left">
                     <p class="text-sm font-semibold text-slate-700 dark:text-slate-200 leading-none">
                         {{ auth()->user()->name ?? 'User' }}

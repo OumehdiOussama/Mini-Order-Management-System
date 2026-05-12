@@ -62,8 +62,22 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         Gate::authorize('view', $product);
-        $product->load('orders');
-        return view('admin.products.show', compact('product'));
+        
+        $orders = $product->orders()
+            ->with('customer')
+            ->latest()
+            ->paginate(10);
+
+        // Pre-calculate stats using database aggregates
+        $totalUnits = $product->orders()->sum('order_product.quantity');
+        $stats = [
+            'total_orders'  => $product->orders()->count(),
+            'total_units'   => $totalUnits,
+            'total_revenue' => $product->price * $totalUnits,
+            'delivered'     => $product->orders()->where('status', 'delivered')->count(),
+        ];
+            
+        return view('admin.products.show', compact('product', 'orders', 'stats'));
     }
 
     /*

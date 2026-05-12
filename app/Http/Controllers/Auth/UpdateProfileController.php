@@ -12,7 +12,19 @@ class UpdateProfileController extends Controller
     public function __invoke(UpdateProfileRequest $request)
     {
         $user = User::find(Auth::id());
-        $user->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($user->photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->photo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->photo);
+            }
+            
+            $path = $request->file('photo')->store('avatars', 'public');
+            $data['photo'] = $path;
+        }
+
+        $user->update($data);
 
         if ($user->role === 'customer' && $user->customer) {
             $user->customer->update([

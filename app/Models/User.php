@@ -26,7 +26,8 @@ class User extends Authenticatable
         "otp",
         "account_verified_at",
         "role",
-        "notification_settings"
+        "notification_settings",
+        "photo"
     ];
 
     /**

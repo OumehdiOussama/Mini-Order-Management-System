@@ -9,10 +9,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Product extends Model {
     use HasFactory, LogsActivity;
 
-    protected $fillable = ['name', 'price', 'image_path'];
+    protected $fillable = [
+        'name',
+        'description',
+        'price',
+        'stock',
+        'is_active',
+        'image_path',
+    ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'price'     => 'decimal:2',
+        'stock'     => 'integer',
+        'is_active' => 'boolean',
     ];
 
     public function orders() {

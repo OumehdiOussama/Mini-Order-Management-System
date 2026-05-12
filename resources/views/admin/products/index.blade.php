@@ -6,7 +6,7 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">Products</h1>
-        <p class="page-subtitle">{{ \App\Models\Product::count() }} products in your catalog</p>
+        <p class="page-subtitle">{{ $products->total() }} products in your catalog</p>
     </div>
     <div class="flex gap-2">
         <button @click="$dispatch('toggle-selection-mode')" class="btn-ghost text-slate-500 hover:text-red-600 border border-slate-200 hover:border-red-100 flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-200 font-medium">
@@ -113,7 +113,7 @@
     </div>
 
     {{-- Product Grid --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         @foreach($products as $product)
         <div :class="selectionMode ? (selected.includes('{{ $product->id }}') ? 'ring-2 ring-brand-500 bg-brand-50/5' : 'cursor-pointer hover:bg-slate-50') : 'hover:shadow-card-hover'"
              @click="if(selectionMode) { if(selected.includes('{{ $product->id }}')) selected = selected.filter(id => id !== '{{ $product->id }}'); else selected.push('{{ $product->id }}'); }"
@@ -127,6 +127,14 @@
 
             {{-- Product Image --}}
             <div class="h-40 bg-slate-100 dark:bg-slate-700 flex items-center justify-center relative overflow-hidden">
+                @if(!$product->is_active)
+                    <div class="absolute top-2 right-2 z-10">
+                        <span class="px-2 py-0.5 bg-slate-800/80 text-white text-[10px] font-bold uppercase tracking-wider rounded backdrop-blur-sm">
+                            Hidden
+                        </span>
+                    </div>
+                @endif
+
                 @if($product->image_path)
                     <img src="{{ asset('storage/' . $product->image_path) }}" 
                          alt="{{ $product->name }}" 
@@ -155,10 +163,23 @@
 
             {{-- Card Body --}}
             <div class="p-4 flex flex-col flex-1">
-                <a href="{{ route('products.show', $product) }}"
-                   class="text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-400 line-clamp-2 mb-1">
-                    {{ $product->name }}
-                </a>
+                <div class="flex items-start justify-between gap-2 mb-1">
+                    <a href="{{ route('products.show', $product) }}"
+                       class="text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-400 line-clamp-2">
+                        {{ $product->name }}
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-2 mb-3">
+                    @if($product->stock <= 0)
+                        <span class="text-[10px] font-bold text-red-600 bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded">Out of Stock</span>
+                    @elseif($product->stock <= 5)
+                        <span class="text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded">Low Stock: {{ $product->stock }}</span>
+                    @else
+                        <span class="text-[10px] font-bold text-slate-500 bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">Stock: {{ $product->stock }}</span>
+                    @endif
+                </div>
+
                 <div class="mt-auto pt-3 flex items-center justify-between">
                     <span class="text-base font-bold text-emerald-600 dark:text-emerald-400">
                         {{ number_format($product->price, 2) }} MAD

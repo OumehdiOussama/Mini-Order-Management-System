@@ -16,6 +16,7 @@ class ProductService
         if (isset($data['image']) && $data['image'] instanceof UploadedFile) {
             $data['image_path'] = $data['image']->store('products', 'public');
         }
+        unset($data['image']); // not a DB column
 
         return Product::create($data);
     }
@@ -32,6 +33,7 @@ class ProductService
             $this->deleteImage($product);
             $data['image_path'] = null;
         }
+        unset($data['image'], $data['remove_image']); // not DB columns
 
         $product->update($data);
 

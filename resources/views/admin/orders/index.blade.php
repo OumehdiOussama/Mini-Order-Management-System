@@ -98,10 +98,17 @@
                     </td>
                     <td>
                         <div class="flex items-center gap-2.5">
-                            <div class="shrink-0"
-                                 style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:700;">
-                                {{ strtoupper(substr($order->customer->name, 0, 2)) }}
-                            </div>
+                            @if($order->customer->user && $order->customer->user->photo)
+                                <img src="{{ asset('storage/' . $order->customer->user->photo) }}" 
+                                     alt="{{ $order->customer->name }}" 
+                                     class="shrink-0 object-cover border border-slate-200 dark:border-slate-700"
+                                     style="width:30px;height:30px;border-radius:8px;">
+                            @else
+                                <div class="shrink-0"
+                                     style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:700;">
+                                    {{ strtoupper(substr($order->customer->name, 0, 2)) }}
+                                </div>
+                            @endif
                             <div>
                                 <p class="text-sm font-medium text-slate-800 dark:text-slate-200">{{ $order->customer->name }}</p>
                                 <p class="text-xs text-slate-400">{{ $order->customer->email }}</p>

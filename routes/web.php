@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResendVerificationController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\UpdateProfileController;
 use App\Http\Controllers\Auth\VerifyAccountController;
@@ -12,6 +13,8 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Api\DashboardApiController;
+use App\Http\Controllers\Api\NotificationApiController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -37,6 +40,7 @@ Route::post("/reset-password", ResetPasswordController::class)->name("password.u
 
 Route::view("/verify-account/{identifier}","auth.verify-account")->name("account.verify");
 Route::post("/verify-account",VerifyAccountController::class);
+Route::post("/send-verification-otp", ResendVerificationController::class)->name("account.resend");
 
 Route::middleware("auth")->group(function(){
     Route::middleware('role:admin,staff')->group(function () {
@@ -58,7 +62,12 @@ Route::middleware("auth")->group(function(){
     Route::post("/change-password", ChangePasswordController::class);
 
     Route::post('/profile/notifications', \App\Http\Controllers\Auth\UpdateNotificationSettingsController::class)->name('profile.notifications.update');
-    Route::post('/notifications/mark-all-read', [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
-    Route::post('/notifications/{id}/mark-read', [\App\Http\Controllers\NotificationController::class, 'markRead'])->name('notifications.markRead');
+    Route::post('/notifications/mark-all-read', [NotificationApiController::class, 'markAllRead'])->name('notifications.markAllRead');
+    Route::post('/notifications/{id}/mark-read', [NotificationApiController::class, 'markRead'])->name('notifications.markRead');
+    Route::get('/api/notifications', [NotificationApiController::class, 'index'])->name('api.notifications.index');
+    
+    // Dashboard API Metrics
+    Route::get('/api/dashboard/metrics', [DashboardApiController::class, 'metrics'])->name('api.dashboard.metrics');
+
     Route::post('/logout', LogoutController::class)->name("logout");
 });

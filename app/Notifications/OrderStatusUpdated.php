@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderStatusUpdated extends Notification
+class OrderStatusUpdated extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -39,19 +39,9 @@ class OrderStatusUpdated extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $status = ucfirst($this->order->status);
-        $message = (new MailMessage)
-            ->subject("Order Update: #{$this->order->id} is now {$status}")
-            ->line("Your order #{$this->order->id} status has been updated to: {$status}.")
-            ->line("Total Price: {$this->order->getTotalPrice()} MAD");
-
-        if ($this->order->status === 'shipped') {
-            $message->line("Tracking Number: {$this->order->tracking_number}")
-                    ->line("Carrier: {$this->order->carrier}");
-        }
-
-        return $message->action('View Order', url('/orders/' . $this->order->id))
-                       ->line('Thank you for shopping with us!');
+        return (new MailMessage)
+            ->subject("Order Update: #{$this->order->id} is now " . ucfirst($this->order->status))
+            ->view('emails.order-status-updated', ['order' => $this->order]);
     }
 
     /**
@@ -63,10 +53,12 @@ class OrderStatusUpdated extends Notification
     {
         return [
             'title' => 'Order Status Updated',
-            'message' => 'Order #' . $this->order->id . ' is now ' . $this->order->status,
+            'message' => 'Order <strong>#' . $this->order->id . '</strong> has been marked as <strong>' . $this->order->status . '</strong>.',
             'type' => 'info',
             'order_id' => $this->order->id,
             'status' => $this->order->status,
+            'actor_name' => auth()->user()->name ?? 'System',
+            'actor_photo' => auth()->user()->photo ?? null,
         ];
     }
 }

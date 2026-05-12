@@ -55,7 +55,7 @@
 
 {{-- Mobile Overlay --}}
 <div id="sidebar-overlay"
-    class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden backdrop-blur-sm"
+    class="fixed inset-0 z-40 hidden bg-black/50 lg:hidden backdrop-blur-sm"
     onclick="closeSidebar()">
 </div>
 
@@ -79,8 +79,8 @@
 
     {{-- Logo --}}
     <div class="flex items-center h-16 px-4 border-b border-slate-800 shrink-0">
-        <a href="{{ route('dashboard.index') }}" class="flex items-center gap-3 min-w-0">
-            <div class="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center shrink-0">
+        <a href="{{ route('dashboard.index') }}" class="flex items-center min-w-0 gap-3">
+            <div class="flex items-center justify-center w-9 h-9 bg-brand-500 rounded-xl shrink-0">
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -88,20 +88,20 @@
             </div>
             <span x-show="!collapsed" x-transition:enter="transition-all duration-200"
                   x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-                  class="text-white font-bold text-lg tracking-tight whitespace-nowrap overflow-hidden">
+                  class="overflow-hidden text-lg font-bold tracking-tight text-white whitespace-nowrap">
                 OMS
             </span>
         </a>
     </div>
 
     {{-- Navigation --}}
-    <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-5">
+    <nav class="flex-1 px-2 py-4 space-y-5 overflow-y-auto">
         @foreach($navSections as $section)
         @if(!($section['hidden'] ?? false))
         <div>
             {{-- Section label --}}
             <div x-show="!collapsed" x-transition
-                 class="mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider px-3">
+                 class="px-3 mb-2 text-xs font-semibold tracking-wider uppercase text-slate-500">
                 {{ $section['label'] }}
             </div>
 
@@ -126,7 +126,7 @@
                           x-transition:enter="transition-all duration-150"
                           x-transition:enter-start="opacity-0"
                           x-transition:enter-end="opacity-100"
-                          class="whitespace-nowrap overflow-hidden">
+                          class="overflow-hidden whitespace-nowrap">
                         {{ $item['label'] }}
                     </span>
                 </a>
@@ -139,32 +139,38 @@
     </nav>
 
     {{-- Bottom: User + Collapse --}}
-    <div class="border-t border-slate-800 p-3 space-y-2 shrink-0">
+    <div class="p-3 space-y-2 border-t border-slate-800 shrink-0">
 
         {{-- Collapse Toggle (desktop) --}}
         <button @click="toggle()"
-                class="hidden lg:flex w-full items-center gap-3 px-2 py-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-150 text-sm"
+                class="items-center hidden w-full gap-3 px-2 py-2 text-sm transition-all duration-150 rounded-lg lg:flex text-slate-400 hover:text-white hover:bg-slate-800"
                 :class="collapsed ? 'justify-center' : ''"
                 :title="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
-            <svg class="w-5 h-5 shrink-0 transition-transform duration-300"
+            <svg class="w-5 h-5 transition-transform duration-300 shrink-0"
                  :class="collapsed ? 'rotate-180' : ''"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                       d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
             </svg>
-            <span x-show="!collapsed" class="whitespace-nowrap text-xs font-medium">Collapse</span>
+            <span x-show="!collapsed" class="text-xs font-medium whitespace-nowrap">Collapse</span>
         </button>
 
-        {{-- User Info --}}
         <div class="flex items-center gap-3 px-2 py-2 rounded-lg"
              :class="collapsed ? 'justify-center' : ''">
-            <div class="avatar-sm shrink-0"
-                 style="background: linear-gradient(135deg, #6366f1, #8b5cf6); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; color:white; font-weight:700;">
-                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
-            </div>
-            <div x-show="!collapsed" class="min-w-0 flex-1">
+            @if(auth()->user()->photo)
+                <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
+                     alt="{{ auth()->user()->name }}" 
+                     class="shrink-0 object-cover border border-slate-700"
+                     style="width:32px; height:32px; border-radius:8px;">
+            @else
+                <div class="avatar-sm shrink-0"
+                     style="background: linear-gradient(135deg, #6366f1, #8b5cf6); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; color:white; font-weight:700;">
+                    {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 2)) }}
+                </div>
+            @endif
+            <div x-show="!collapsed" class="flex-1 min-w-0">
                 <p class="text-sm font-semibold text-white truncate">{{ auth()->user()->name ?? 'User' }}</p>
-                <p class="text-xs text-slate-400 truncate">{{ auth()->user()->email ?? '' }}</p>
+                <p class="text-xs truncate text-slate-400">{{ auth()->user()->email ?? '' }}</p>
             </div>
         </div>
 
@@ -173,7 +179,7 @@
             @csrf
             <button type="submit"
                     :class="collapsed ? 'justify-center px-2' : ''"
-                    class="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-150">
+                    class="flex items-center w-full gap-3 px-3 py-2 text-sm font-medium transition-all duration-150 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10">
                 <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                           d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
@@ -187,7 +193,7 @@
 
 {{-- Mobile Toggle Button --}}
 <button onclick="openSidebar()"
-        class="lg:hidden fixed bottom-5 right-5 z-30 w-12 h-12 bg-brand-500 hover:bg-brand-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200">
+        class="fixed z-30 flex items-center justify-center w-12 h-12 text-white transition-all duration-200 rounded-full shadow-lg lg:hidden bottom-5 right-5 bg-brand-500 hover:bg-brand-600">
     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
     </svg>

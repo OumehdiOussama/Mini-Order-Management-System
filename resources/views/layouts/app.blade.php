@@ -42,24 +42,25 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon2.svg') }}">
     <title>@yield('title', 'Dashboard') | OMS</title>
-    <!-- Inter Font -->
+    <!-- Inter Font: non-render-blocking async load -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="style"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet"
+              href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    </noscript>
     <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
-    <!-- HTMX for SPA Navigation -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    
+    <!-- Alpine.js pinned to stable version -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
     @stack('head')
 </head>
 
-<body hx-boost="true" class="min-h-screen bg-[var(--surface-bg)] text-[var(--text-primary)] font-sans antialiased">
+<body class="min-h-screen bg-[var(--surface-bg)] text-[var(--text-primary)] font-sans antialiased">
 
     <!-- Sidebar -->
     @include('partials.sidebar')
@@ -74,9 +75,7 @@
         <main class="flex-1 px-5 py-6 sm:px-6 lg:px-8 lg:py-7">
             <div class="w-full mx-auto max-w-7xl">
 
-                @if(!request()->routeIs('profile'))
-                    @include('partials.alerts')
-                @endif
+                @include('partials.alerts')
 
                 @yield('content')
 

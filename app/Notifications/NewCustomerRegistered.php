@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewCustomerRegistered extends Notification
+class NewCustomerRegistered extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -40,9 +40,11 @@ class NewCustomerRegistered extends Notification
     {
         return [
             'title' => 'New Customer Registered',
-            'message' => 'Customer ' . $this->customer->name . ' has just registered.',
+            'message' => '<strong>' . $this->customer->name . '</strong> has just joined the platform.',
             'type' => 'info',
             'customer_id' => $this->customer->id,
+            'actor_name' => $this->customer->name,
+            'actor_photo' => $this->customer->user->photo ?? null,
         ];
     }
 }

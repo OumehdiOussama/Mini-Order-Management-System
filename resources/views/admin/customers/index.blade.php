@@ -69,9 +69,16 @@
                             <tr>
                                 <td>
                                     <div class="flex items-center gap-3">
-                                        <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;color:white;font-weight:700;shrink:0">
-                                            {{ strtoupper(substr($customer->name, 0, 2)) }}
-                                        </div>
+                                        @if($customer->user && $customer->user->photo)
+                                            <img src="{{ asset('storage/' . $customer->user->photo) }}" 
+                                                 alt="{{ $customer->name }}" 
+                                                 class="shrink-0 object-cover border border-slate-200 dark:border-slate-700"
+                                                 style="width:34px;height:34px;border-radius:10px;">
+                                        @else
+                                            <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;color:white;font-weight:700;shrink:0">
+                                                {{ strtoupper(substr($customer->name, 0, 2)) }}
+                                            </div>
+                                        @endif
                                         <div>
                                             <a href="{{ route('customers.show', $customer) }}"
                                             class="text-sm font-semibold text-slate-800 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-400">

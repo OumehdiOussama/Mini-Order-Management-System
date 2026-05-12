@@ -1,42 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Reset Password</title>
-    <link rel="shortcut icon" href="{{ asset('favicon.png') }}" type="image/png">
-</head>
-<body style="background-color: #1f2937; color: #e5e7eb; font-family: Arial, sans-serif; padding: 20px;">
+@extends('layouts.email')
 
-    <table align="center" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #111827; padding: 20px; border-radius: 8px;">
-        <tr>
-            <td align="center" style="padding-bottom: 20px;">
-                <h2 style="color: #10b981; font-size: 24px; margin: 0;">Reset Your Password</h2>
-            </td>
-        </tr>
-        
-        <tr>
-            <td style="padding: 20px; color: #d1d5db;">
-                <p>Hello,</p>
-                <p>You requested to reset your password. Click the button below to create a new password:</p>
-                <p style="text-align: center; margin: 20px 0;">
-                    <a href="{{ $resetUrl }}" style="background-color: #3b82f6; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">
-                        Reset Password
-                    </a>
-                </p>
-                <p>If you did not request a password reset, please ignore this email.</p>
-                <p>Thank you,<br>Your Application Team</p>
-            </td>
-        </tr>
+@section('subject', 'Reset your password')
 
-        <tr>
-            <td align="center" style="padding-top: 20px; font-size: 12px; color: #9ca3af;">
-                <p>If the button above does not work, copy and paste the following link into your browser:</p>
-                <p>{{ $resetUrl }}</p>
-            </td>
-        </tr>
-    </table>
+@section('content')
+    <h1 class="title">Reset your password</h1>
+    <p class="text">
+        Hello, <br><br>
+        We received a request to reset the password for your <strong>OMS</strong> account. Click the button below to choose a new password.
+    </p>
 
-</body>
-</html>
+    <div style="text-align: center; margin: 32px 0;">
+        <a href="{{ $resetUrl }}" class="btn">Set New Password</a>
+    </div>
+
+    <p class="text" style="font-size: 14px; color: #8898aa;">
+        For your security, this link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.
+    </p>
+
+    <div class="divider"></div>
+
+    <p class="text" style="font-size: 12px; color: #8898aa; margin-bottom: 0;">
+        If you're having trouble clicking the button, copy and paste this URL into your browser: <br>
+        <span style="word-break: break-all; color: #6366f1;">{{ $resetUrl }}</span>
+    </p>
+@endsection
+
+@section('accent')
+    <div style="text-align: center;">
+        <p style="margin: 0; font-size: 13px; color: #525f7f; font-weight: 500;">
+            Secure Account Tip: Use a unique password with at least 10 characters and special symbols.
+        </p>
+    </div>
+@endsection

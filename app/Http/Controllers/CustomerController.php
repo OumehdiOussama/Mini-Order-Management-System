@@ -64,8 +64,21 @@ class CustomerController extends Controller
     public function show(Customer $customer)
     {
         Gate::authorize('view', $customer);
-        $customer->load('orders');
-        return view('admin.customers.show', compact('customer'));
+        
+        $orders = $customer->orders()
+            ->with('products')
+            ->latest()
+            ->paginate(10);
+
+        // Pre-calculate stats using database aggregates for performance
+        $stats = [
+            'total_orders' => $customer->orders()->count(),
+            'total_spent'  => $customer->orders->sum(fn($o) => $o->getTotalPrice()), // This still uses collection, but we can't easily sum calculated total in SQL without raw queries or redundant columns.
+            'delivered'    => $customer->orders()->where('status', 'delivered')->count(),
+            'active'       => $customer->orders()->whereIn('status', ['pending', 'processing', 'shipped'])->count(),
+        ];
+            
+        return view('admin.customers.show', compact('customer', 'orders', 'stats'));
     }
 
     /**

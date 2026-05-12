@@ -69,31 +69,27 @@
 
     {{-- Right Sidebar: Stats --}}
     <div class="space-y-5">
-        @php
-            $totalUnits    = $product->orders->sum('pivot.quantity');
-            $totalRevenue  = $product->price * $totalUnits;
-            $deliveredOrds = $product->orders->where('status','delivered')->count();
-        @endphp
+
         <div class="card p-5">
             <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Sales Statistics</h3>
             <div class="space-y-3">
                 <div class="flex items-center justify-between p-3 bg-brand-50 dark:bg-brand-900/20 rounded-lg">
                     <span class="text-sm text-slate-600 dark:text-slate-300">Total Orders</span>
-                    <span class="text-lg font-bold text-brand-600 dark:text-brand-400">{{ $product->orders->count() }}</span>
+                    <span class="text-lg font-bold text-brand-600 dark:text-brand-400">{{ $stats['total_orders'] }}</span>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                     <span class="text-sm text-slate-600 dark:text-slate-300">Units Sold</span>
-                    <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ $totalUnits }}</span>
+                    <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ $stats['total_units'] }}</span>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-violet-50 dark:bg-violet-900/20 rounded-lg">
                     <span class="text-sm text-slate-600 dark:text-slate-300">Revenue</span>
                     <span class="text-base font-bold text-violet-600 dark:text-violet-400">
-                        {{ number_format($totalRevenue, 2) }} MAD
+                        {{ number_format($stats['total_revenue'], 2) }} MAD
                     </span>
                 </div>
                 <div class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                     <span class="text-sm text-slate-600 dark:text-slate-300">Delivered</span>
-                    <span class="text-lg font-bold text-amber-600 dark:text-amber-400">{{ $deliveredOrds }}</span>
+                    <span class="text-lg font-bold text-amber-600 dark:text-amber-400">{{ $stats['delivered'] }}</span>
                 </div>
             </div>
         </div>
@@ -115,10 +111,10 @@
 <div class="card overflow-hidden">
     <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
         <h2 class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">
-            Order History ({{ $product->orders->count() }})
+            Order History ({{ $stats['total_orders'] }})
         </h2>
     </div>
-    @if($product->orders->isEmpty())
+    @if($orders->isEmpty())
     <div class="empty-state py-12">
         <div class="empty-state-icon mx-auto">
             <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,7 +139,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($product->orders as $order)
+                @foreach($orders as $order)
                 <tr class="group">
                     <td class="pl-6">
                         <a href="{{ route('orders.show', $order) }}"
@@ -179,6 +175,9 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+    <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-700">
+        {{ $orders->links() }}
     </div>
     @endif
 </div>

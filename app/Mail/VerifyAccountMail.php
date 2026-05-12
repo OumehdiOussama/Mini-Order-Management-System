@@ -30,7 +30,7 @@ class VerifyAccountMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Verify Account Mail',
+            subject: 'Verify your OMS account',
         );
     }
 

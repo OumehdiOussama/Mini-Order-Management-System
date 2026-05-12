@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<form method="POST" action="{{ route('orders.store') }}" id="orderForm">
+<form method="POST" action="{{ route('orders.store') }}" id="orderForm" hx-boost="false">
 @csrf
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -43,7 +43,33 @@
         </div>
 
         {{-- Product Picker --}}
-        <div class="card overflow-hidden" x-data="orderPicker()">
+        <div class="card overflow-hidden"
+             x-data="{
+                products: @js($products->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'price' => (float)$p->price])),
+                selected: {},
+                quantities: {},
+                toggle(id) {
+                    if (this.selected[id]) {
+                        delete this.selected[id];
+                        delete this.quantities[id];
+                    } else {
+                        this.selected[id] = true;
+                        this.quantities[id] = 1;
+                    }
+                },
+                isSelected(id) { return !!this.selected[id]; },
+                getSubtotal(productId) {
+                    const product = this.products.find(p => p.id === productId);
+                    const qty = parseInt(this.quantities[productId]) || 0;
+                    return product ? (product.price * qty).toFixed(2) : '0.00';
+                },
+                getTotal() {
+                    return this.products
+                        .filter(p => this.selected[p.id])
+                        .reduce((sum, p) => sum + (p.price * (parseInt(this.quantities[p.id]) || 0)), 0)
+                        .toFixed(2);
+                }
+             }">
 
             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
                 <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -63,23 +89,22 @@
             </div>
             @enderror
 
-            <div class="divide-y divide-slate-100 dark:divide-slate-700 max-h-80 overflow-y-auto">
+            <div class="divide-y divide-slate-100 dark:divide-slate-700 max-h-96 overflow-y-auto">
                 @foreach($products as $product)
                 <div class="flex items-center gap-4 px-5 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
                      :class="isSelected({{ $product->id }}) ? 'bg-brand-50/50 dark:bg-brand-900/10' : ''">
-                    {{-- Checkbox --}}
                     <input type="checkbox"
-                           name="products[]"
+                           name="products[{{ $product->id }}]"
                            value="{{ $product->id }}"
                            id="product_{{ $product->id }}"
-                           @click="toggle({{ $product->id }})"
+                           @change="toggle({{ $product->id }})"
                            :checked="isSelected({{ $product->id }})"
                            class="w-4 h-4 accent-brand-500 cursor-pointer rounded">
-                    {{-- Product Image --}}
+
                     <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0 overflow-hidden">
                         @if($product->image_path)
-                            <img src="{{ asset('storage/' . $product->image_path) }}" 
-                                 alt="{{ $product->name }}" 
+                            <img src="{{ asset('storage/' . $product->image_path) }}"
+                                 alt="{{ $product->name }}"
                                  class="w-full h-full object-cover">
                         @else
                             <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,27 +113,26 @@
                         @endif
                     </div>
 
-                    {{-- Product Info --}}
                     <label for="product_{{ $product->id }}" class="flex-1 cursor-pointer">
                         <p class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ $product->name }}</p>
                         <p class="text-xs text-slate-400 font-medium">{{ number_format($product->price, 2) }} MAD / unit</p>
                     </label>
-                    {{-- Quantity Input --}}
+
                     <div x-show="isSelected({{ $product->id }})" class="flex items-center gap-2">
                         <input type="number"
                                name="quantities[{{ $product->id }}]"
-                               :value="quantities[{{ $product->id }}]"
-                               @input="quantities[{{ $product->id }}] = $event.target.value"
+                               x-model.number="quantities[{{ $product->id }}]"
                                min="1" max="999"
+                               :disabled="!isSelected({{ $product->id }})"
                                class="input-field w-20 text-center py-1.5"
                                placeholder="Qty">
-                        <span class="text-xs text-slate-500 w-20 text-right" x-text="getSubtotal({{ $product->id }}) + ' MAD'"></span>
+                        <span class="text-xs text-slate-500 w-24 text-right font-medium"
+                              x-text="getSubtotal({{ $product->id }}) + ' MAD'"></span>
                     </div>
                 </div>
                 @endforeach
             </div>
 
-            {{-- Live Total --}}
             <div class="px-5 py-3 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
                 <span class="text-sm text-slate-500">Estimated Total</span>
                 <span class="text-lg font-bold text-slate-900 dark:text-white" x-text="getTotal() + ' MAD'">0.00 MAD</span>
@@ -133,10 +157,7 @@
                 </div>
             </div>
             <div class="mt-5 pt-4 border-t border-slate-200 dark:border-slate-700">
-                <div class="flex items-center justify-between mb-1">
-                    <span class="text-sm text-slate-500">Notifications</span>
-                </div>
-                <p class="text-xs text-slate-400">Customer will receive an email confirmation after order creation.</p>
+                <p class="text-xs text-slate-400">You will receive an email confirmation after your order is placed.</p>
             </div>
         </div>
 
@@ -154,36 +175,3 @@
 
 </form>
 @endsection
-
-@push('scripts')
-<script>
-function orderPicker() {
-    return {
-        products: @js($products->map(fn($p) => ["id" => $p->id, "name" => $p->name, "price" => (float)$p->price])),
-        selected: {},
-        quantities: {},
-        toggle(id) {
-            if (this.selected[id]) {
-                delete this.selected[id];
-                delete this.quantities[id];
-            } else {
-                this.selected[id] = true;
-                this.quantities[id] = 1;
-            }
-        },
-        isSelected(id) { return !!this.selected[id]; },
-        getSubtotal(productId) {
-            const product = this.products.find(p => p.id === productId);
-            const qty = parseInt(this.quantities[productId]) || 0;
-            return product ? (product.price * qty).toFixed(2) : "0.00";
-        },
-        getTotal() {
-            return this.products
-                .filter(p => this.selected[p.id])
-                .reduce((sum, p) => sum + (p.price * (parseInt(this.quantities[p.id]) || 0)), 0)
-                .toFixed(2);
-        }
-    }
-}
-</script>
-@endpush

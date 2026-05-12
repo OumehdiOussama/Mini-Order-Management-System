@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewOrderCreated extends Notification
+class NewOrderCreated extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -37,9 +37,8 @@ class NewOrderCreated extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
+            ->subject("Order Confirmation: #{$this->order->id}")
+            ->view('emails.order-confirmation', ['order' => $this->order]);
     }
 
     /**
@@ -51,9 +50,12 @@ class NewOrderCreated extends Notification
     {
         return [
             'title' => 'New Order Created',
-            'message' => 'A new order #' . $this->order->id . ' has been placed.',
+            'message' => 'A new order <strong>#' . $this->order->id . '</strong> has been placed by <strong>' . ($this->order->customer->name ?? 'Guest') . '</strong>.',
             'type' => 'success',
             'order_id' => $this->order->id,
+            'actor_name' => $this->order->customer->name ?? 'Guest',
+            'actor_photo' => $this->order->customer->user->photo ?? null,
+            'amount' => $this->order->getTotalPrice() . ' MAD',
         ];
     }
 }

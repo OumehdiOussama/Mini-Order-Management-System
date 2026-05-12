@@ -65,15 +65,24 @@ class OrderController extends Controller
     public function create()
     {
         Gate::authorize('create', Order::class);
-        
+
         $user = auth()->user();
+
         if ($user->role === 'customer') {
             $customers = $user->customer ? collect([$user->customer]) : collect();
         } else {
-            $customers = Customer::all(); // Could be cached
+            // Only fetch columns needed for the dropdown — skips all heavy fields
+            $customers = Customer::orderBy('name')
+                ->select(['id', 'name', 'email'])
+                ->get();
         }
 
-        $products = Product::all(); // Could be cached
+        // Only show active products with stock, select only needed columns
+        $products = Product::select(['id', 'name', 'price', 'stock', 'image_path'])
+            ->where('stock', '>', 0)
+            ->orderBy('name')
+            ->get();
+
         $viewPath = $user->role === 'customer' ? 'customer.orders.create' : 'admin.orders.create';
         return view($viewPath, compact('customers', 'products'));
     }
@@ -85,9 +94,12 @@ class OrderController extends Controller
     {
         Gate::authorize('create', Order::class);
 
-        $this->orderService->createOrder($request->validated(), $request->user());
-
-        return redirect()->route('orders.index')->with('success', 'Order created successfully!');
+        try {
+            $this->orderService->createOrder($request->validated(), $request->user());
+            return redirect()->route('orders.index')->with('success', 'Order created successfully!');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        }
     }
 
     /*

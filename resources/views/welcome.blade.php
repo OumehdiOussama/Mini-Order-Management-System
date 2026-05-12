@@ -17,17 +17,22 @@
     
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon2.svg') }}">
 
-    <!-- Inter Font -->
+    <!-- Inter & Tajawal Fonts: non-render-blocking async load -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="preload" as="style"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet"
+              href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap">
+    </noscript>
 
     <!-- Vite Assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Alpine.js pinned to stable version -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
     <style>
         [x-cloak] { display: none !important; }
@@ -43,7 +48,7 @@
         }
     </style>
 </head>
-<body class="bg-[var(--surface-bg)] text-[var(--text-primary)] font-sans antialiased overflow-x-hidden" hx-boost="true">
+<body class="bg-[var(--surface-bg)] text-[var(--text-primary)] font-sans antialiased overflow-x-hidden">
 
     <!-- ── Navigation ── -->
     <nav class="fixed top-0 w-full z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md transition-all duration-300"

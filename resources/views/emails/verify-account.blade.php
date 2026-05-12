@@ -1,44 +1,49 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Email Verification OTP</title>
-    <link rel="shortcut icon" href="{{ asset('favicon.png') }}" type="image/png">
-</head>
+@extends('layouts.email')
 
-<body style="background:#1f2937; color:#e5e7eb; font-family:Arial,sans-serif; padding:20px;">
+@section('subject', 'Verify your account')
 
-<div style="max-width:600px; margin:0 auto; background:#111827; padding:20px; border-radius:8px;">
-
-    <h2 style="color:#10b981; text-align:center;">Account Verification OTP</h2>
-
-    <p>Hello,</p>
-
-    <p>Thank you for registering! Your OTP for email verification is:</p>
-
-    <h3 style="text-align:center; font-size:36px; color:#ffffff;">
-        {{ $otp }}
-    </h3>
-
-    <p style="text-align:center;">Use this OTP to verify your account.</p>
-
-    <p>If you did not create an account, please ignore this email.</p>
-
-    <div style="text-align:center; margin-top:20px;">
-        <a href="{{ $verifyUrl }}"
-           style="background:#3b82f6; color:#ffffff; padding:10px 20px; text-decoration:none; border-radius:4px; font-weight:bold; display:inline-block;">
-            Verify Your Account
-        </a>
+@section('content')
+    <h1 class="title">Welcome to the OMS family!</h1>
+    <p class="text">
+        We're thrilled to have you here. <strong>OMS</strong> is built to help you streamline your order management and scale your operations with ease.
+    </p>
+    
+    <p class="text">
+        To ensure the security of your account and unlock full access to our dashboard, please verify your email address using the secure code below:
+    </p>
+    
+    <div style="background-color: #f6f9fc; border: 1px dashed #e6ebf1; border-radius: 8px; padding: 32px; text-align: center; margin: 32px 0;">
+        <span style="font-size: 36px; font-weight: 800; letter-spacing: 0.2em; color: #6366f1;">{{ $otp }}</span>
+        <p style="margin: 16px 0 0; font-size: 13px; color: #8898aa; font-weight: 500;">(Verification code expires in 20 minutes)</p>
     </div>
 
-    <div style="font-size:12px; color:#9ca3af; text-align:center; margin-top:20px;">
-        <p>If the button does not work, copy this link:</p>
-        <p>{{ $verifyUrl }}</p>
+    <p class="text">
+        Alternatively, you can click the button below to verify your account directly:
+    </p>
+
+    <div style="text-align: center; margin: 32px 0;">
+        <a href="{{ $verifyUrl }}" class="btn">Verify Account</a>
     </div>
 
-</div>
+    <p class="text" style="font-size: 14px; color: #8898aa;">
+        If you didn't create an account with OMS, please ignore this email.
+    </p>
 
-</body>
-</html>
+    <div class="divider"></div>
+
+    <h2 style="font-size: 16px; font-weight: 700; color: #32325d; margin-bottom: 12px;">What can you do with OMS?</h2>
+    <ul style="padding-left: 20px; margin: 0; color: #525f7f; font-size: 14px; line-height: 1.8;">
+        <li>🚀 <strong>Automate</strong> your order processing workflows</li>
+        <li>📦 <strong>Track</strong> shipments in real-time with automatic updates</li>
+        <li>📊 <strong>Analyze</strong> your sales performance with detailed insights</li>
+        <li>👥 <strong>Manage</strong> customer relationships effortlessly</li>
+    </ul>
+@endsection
+
+@section('accent')
+    <div style="text-align: center;">
+        <p style="margin: 0; font-size: 13px; color: #525f7f; font-weight: 500;">
+            Next step: Once verified, you can set up your first product catalog and start managing orders.
+        </p>
+    </div>
+@endsection

@@ -29,7 +29,7 @@ class SendResetLinkMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Send Reset Link Mail',
+            subject: 'Reset your OMS password',
         );
     }
 

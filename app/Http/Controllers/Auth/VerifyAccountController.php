@@ -16,8 +16,13 @@ class VerifyAccountController extends Controller
         $type = filter_var($request->input('identifier'), FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
         
         $user = User::where($type, $request->identifier)->first();
+        
+        if (!$user) {
+            return back()->with("error", "User not found or session expired.");
+        }
+
         if($user->otp != implode("",$request->otp)){
-            return back()->with("error","Invalid OTP or account data");
+            return back()->with("error","Invalid OTP code. Please try again.");
         }
 
         $user->account_verified_at = now();

@@ -62,7 +62,8 @@
         </div>
 
         <form method="POST" action="{{ route('orders.update', $order) }}"
-              x-data="{ selectedStatus: '{{ old('status', $order->status) }}' }">
+              x-data="{ selectedStatus: '{{ old('status', $order->status) }}' }"
+              hx-boost="false">
         @csrf
         @method('PUT')
 

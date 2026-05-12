@@ -16,6 +16,7 @@ class StoreOrderRequest extends FormRequest
 
     /**
      * Prepare the data for validation.
+     * Auto-inject customer_id for customer role users.
      */
     protected function prepareForValidation(): void
     {
@@ -28,42 +29,58 @@ class StoreOrderRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Validation rules.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * Note: 'products' is an associative array keyed by product ID:
+     *   products[1] = "1", products[5] = "5"
+     * This is intentional so OrderService can look up quantities[productId].
      */
     public function rules(): array
     {
         return [
-            'customer_id' => 'required|exists:customers,id',
-            'products' => 'required|array|min:1',
-            'products.*' => 'required|integer|distinct|exists:products,id',
-            'quantities' => 'required|array',
+            'customer_id'  => 'required|exists:customers,id',
+            'products'     => 'required|array|min:1',
+            'products.*'   => 'required|integer|exists:products,id',
+            'quantities'   => 'required|array',
+            'quantities.*' => 'nullable|integer|min:1|max:999',
         ];
     }
 
     /**
-     * Configure the validator instance.
+     * Extra validation: every selected product must have a valid quantity.
      */
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $products = $this->input('products', []);
-            $quantities = $this->input('quantities', []);
+            $products   = $this->input('products', []);   // [productId => productId]
+            $quantities = $this->input('quantities', []); // [productId => qty]
 
-            foreach ($products as $productId) {
-                if (!array_key_exists($productId, $quantities)) {
-                    $validator->errors()->add('quantities', 'Each selected product must have a quantity');
-                    return;
-                }
+            foreach ($products as $productId => $val) {
+                $qty = $quantities[$productId] ?? 0;
 
-                $quantity = $quantities[$productId] ?? 0;
-                
-                if (!is_numeric($quantity) || $quantity <= 0) {
-                    $validator->errors()->add('quantities', 'All ordered quantities must be greater than 0');
+                if (!is_numeric($qty) || (int) $qty < 1) {
+                    $validator->errors()->add(
+                        'quantities',
+                        'All selected products must have a quantity of at least 1.'
+                    );
                     return;
                 }
             }
         });
+    }
+
+    /**
+     * Custom validation messages.
+     */
+    public function messages(): array
+    {
+        return [
+            'products.required'     => 'Please select at least one product.',
+            'products.min'          => 'Please select at least one product.',
+            'customer_id.required'  => 'Please select a customer.',
+            'customer_id.exists'    => 'The selected customer does not exist.',
+            'quantities.*.min'      => 'Each quantity must be at least 1.',
+            'quantities.*.max'      => 'Quantity cannot exceed 999 per product.',
+        ];
     }
 }
