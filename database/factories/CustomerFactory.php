@@ -1,7 +1,7 @@
 <?php
 
 namespace Database\Factories;
-
+$faker = \Faker\Factory::create('fr_FR');
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,9 +17,13 @@ class CustomerFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->phoneNumber(),
+            'name' => $this->faker->name(),
+
+            'email' => $this->faker->unique()->safeEmail(),
+
+            // Moroccan phone numbers
+            'phone' => $this->faker->randomElement(['06', '07']) .
+                    $this->faker->numerify('########'),
         ];
     }
 }
