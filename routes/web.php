@@ -32,7 +32,14 @@ Route::get('/lang/{locale}', function ($locale) {
 Route::post("/register",RegisterController::class);
 Route::post('/login', LoginController::class);
 
-Route::view("/forgot-password","auth.forgot-password")->name("password.request");
+Route::get('/forgot-password', function() {
+    try {
+        return view('auth.forgot-password');
+    } catch (\Exception $e) {
+        return "Rendering Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine();
+    }
+})->name("password.request");
+
 Route::post("/forgot-password", ForgotPasswordController::class)->name("password.email");
 
 Route::view("/reset-password/{token}","auth.reset-password")->name("password.reset");
