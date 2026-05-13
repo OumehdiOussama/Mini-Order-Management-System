@@ -37,8 +37,8 @@ class NewOrderCreated extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject("Order Confirmation: #{$this->order->id}")
-            ->view('emails.order-confirmation', ['order' => $this->order]);
+            ->subject("New Order Received: #{$this->order->id}")
+            ->view('emails.admin-new-order', ['order' => $this->order]);
     }
 
     /**

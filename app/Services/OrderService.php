@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\NewOrderCreated;
 use App\Notifications\OrderStatusUpdated;
+use App\Notifications\CustomerOrderCreated;
 use App\Models\Product;
 use Exception;
 
@@ -112,7 +113,7 @@ class OrderService
             Notification::send($adminsAndStaff, new NewOrderCreated($order));
 
             if ($order->customer && $order->customer->user) {
-                $order->customer->user->notify(new OrderStatusUpdated($order));
+                $order->customer->user->notify(new CustomerOrderCreated($order));
             }
         } catch (\Exception $e) {
             // Notification failure should NOT break order creation
