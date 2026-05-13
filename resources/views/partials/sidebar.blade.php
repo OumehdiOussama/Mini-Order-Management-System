@@ -158,10 +158,8 @@
         <div class="flex items-center gap-3 px-2 py-2 rounded-lg"
              :class="collapsed ? 'justify-center' : ''">
             @if(auth()->user()->photo)
-                <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
-                     alt="{{ auth()->user()->name }}" 
-                     class="shrink-0 object-cover border border-slate-700"
-                     style="width:32px; height:32px; border-radius:8px;">
+                <img src="{{ url('media/' . auth()->user()->photo) }}" 
+                     class="w-10 h-10 rounded-xl object-cover ring-2 ring-white/10 shadow-sm border border-white/10">
             @else
                 <div class="avatar-sm shrink-0"
                      style="background: linear-gradient(135deg, #6366f1, #8b5cf6); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; color:white; font-weight:700;">

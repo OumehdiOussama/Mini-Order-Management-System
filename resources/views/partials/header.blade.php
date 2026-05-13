@@ -34,7 +34,7 @@
             <button @click="open = !open"
                     class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-150 focus:outline-none focus:ring-0">
                 @if(auth()->user()->photo)
-                    <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
+                    <img src="{{ url('media/' . auth()->user()->photo) }}" 
                          alt="{{ auth()->user()->name }}" 
                          class="w-8 h-8 rounded-lg object-cover border border-slate-200 dark:border-slate-700">
                 @else
