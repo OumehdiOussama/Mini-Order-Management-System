@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewOrderCreated extends Notification implements ShouldQueue
+class NewOrderCreated extends Notification
 {
     use Queueable;
 
@@ -28,7 +28,7 @@ class NewOrderCreated extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['mail', 'database'];
     }
 
     /**
