@@ -19,7 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app->environment('production')) {
+        // Only force HTTPS in production AND if not running on localhost/127.0.0.1
+        if ($this->app->environment('production') && !request()->is('localhost*', '127.0.0.1*')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
     }
