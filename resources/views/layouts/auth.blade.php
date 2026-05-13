@@ -91,7 +91,7 @@
 
             <!-- Bottom tagline -->
             <div class="relative z-10">
-                <p class="text-indigo-200 text-sm">© {{ date('Y') }} OrderFlow · Built for modern businesses</p>
+                <p class="text-indigo-200 text-sm">© {{ date('Y') }} OMS · Built for modern businesses</p>
             </div>
         </div>
 

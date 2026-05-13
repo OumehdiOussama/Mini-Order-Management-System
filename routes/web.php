@@ -77,33 +77,33 @@ Route::middleware("auth")->group(function(){
 // ══════════════════════════════════════════
 Route::get('/fix-system', function() {
     try {
-        $output = "--- Starting System Fix ---<br>";
+        $output = "--- Starting Deep System Fix ---<br>";
         
-        // 1. Clear all caches (Force)
+        // 1. Clear all caches
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
         $output .= "✅ Caches cleared.<br>";
 
         // 2. Fix Storage Symlink
         $link = public_path('storage');
-        if (file_exists($link)) {
-            // Remove if it's a broken link or a directory
-            if (is_link($link)) {
-                unlink($link);
-            } else {
-                // If it's a real folder, we might need to be careful, but usually it should be a link
-                $output .= "⚠️ Warning: 'public/storage' is a real folder, not a link.<br>";
-            }
+        if (file_exists($link) && is_link($link)) {
+            unlink($link);
         }
-        
         \Illuminate\Support\Facades\Artisan::call('storage:link');
         $output .= "✅ Storage symlink recreated.<br>";
 
-        // 3. Force Migrations
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        $output .= "✅ Migrations verified.<br>";
+        // 3. Database Table Verification
+        $tables = ['users', 'products', 'orders', 'notifications', 'password_reset_tokens'];
+        foreach ($tables as $table) {
+            if (\Illuminate\Support\Facades\Schema::hasTable($table)) {
+                $output .= "✅ Table '{$table}' exists.<br>";
+            } else {
+                $output .= "❌ Table '{$table}' IS MISSING! Trying to migrate...<br>";
+                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            }
+        }
 
-        return $output . "<br>🚀 **System Refresh Complete!** Please test your photos and Forgot Password now.";
+        return $output . "<br>🚀 **Deep Refresh Complete!** Please check if the 500 error persists.";
     } catch (\Exception $e) {
-        return "❌ Error: " . $e->getMessage();
+        return "❌ Critical Error: " . $e->getMessage();
     }
 });
