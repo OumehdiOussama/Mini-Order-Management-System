@@ -77,20 +77,33 @@ Route::middleware("auth")->group(function(){
 // ══════════════════════════════════════════
 Route::get('/fix-system', function() {
     try {
-        // 1. Clear all caches
+        $output = "--- Starting System Fix ---<br>";
+        
+        // 1. Clear all caches (Force)
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-        $output = "Caches cleared successfully.<br>";
+        $output .= "✅ Caches cleared.<br>";
 
-        // 2. Create Storage Link
+        // 2. Fix Storage Symlink
+        $link = public_path('storage');
+        if (file_exists($link)) {
+            // Remove if it's a broken link or a directory
+            if (is_link($link)) {
+                unlink($link);
+            } else {
+                // If it's a real folder, we might need to be careful, but usually it should be a link
+                $output .= "⚠️ Warning: 'public/storage' is a real folder, not a link.<br>";
+            }
+        }
+        
         \Illuminate\Support\Facades\Artisan::call('storage:link');
-        $output .= "Storage symlink created.<br>";
+        $output .= "✅ Storage symlink recreated.<br>";
 
-        // 3. Run Migrations (for notifications and password reset tokens)
+        // 3. Force Migrations
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        $output .= "Migrations executed.<br>";
+        $output .= "✅ Migrations verified.<br>";
 
-        return $output . "<br>🚀 System fixed! Please refresh your profile page.";
+        return $output . "<br>🚀 **System Refresh Complete!** Please test your photos and Forgot Password now.";
     } catch (\Exception $e) {
-        return "Error during fix: " . $e->getMessage();
+        return "❌ Error: " . $e->getMessage();
     }
 });

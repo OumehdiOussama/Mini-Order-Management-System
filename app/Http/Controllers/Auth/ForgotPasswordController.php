@@ -18,25 +18,29 @@ class ForgotPasswordController extends Controller
      */
     public function __invoke(ForgotPasswordRequest $request)
     {
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return back()->with("error", "We couldn't find a user with that email address.");
-        }
-
-        $token = Str::random(60);
-
-        DB::table("password_reset_tokens")->updateOrInsert(
-            ["email" => $request->email],
-            ["token" =>$token, "created_at" => now()]
-        );
-
         try {
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return back()->with("error", "We couldn't find a user with that email address.");
+            }
+
+            $token = Str::random(60);
+
+            DB::table("password_reset_tokens")->updateOrInsert(
+                ["email" => $request->email],
+                ["token" =>$token, "created_at" => now()]
+            );
+
             Mail::to($request->email)->send(new SendResetLinkMail($token));
+            
+            return back()->with("success","We’ve sent you a password reset link. Please check your email.");
+
         } catch (\Exception $e) {
-            return back()->with("error", "The mail server is currently unavailable. Please try again later.");
+            // Log the error for the developer
+            \Log::error("Forgot Password Error: " . $e->getMessage());
+            
+            return back()->with("error", "There was a technical issue: " . $e->getMessage());
         }
-        
-        return back()->with("success","We’ve sent you a password reset link. Please check your email.");
     }
 }
