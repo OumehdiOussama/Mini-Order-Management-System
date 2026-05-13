@@ -31,7 +31,11 @@ class ForgotPasswordController extends Controller
             ["token" =>$token, "created_at" => now()]
         );
 
-        Mail::to($request->email)->send(new SendResetLinkMail($token));
+        try {
+            Mail::to($request->email)->send(new SendResetLinkMail($token));
+        } catch (\Exception $e) {
+            return back()->with("error", "The mail server is currently unavailable. Please try again later.");
+        }
         
         return back()->with("success","We’ve sent you a password reset link. Please check your email.");
     }

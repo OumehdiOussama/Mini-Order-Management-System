@@ -128,7 +128,7 @@
                     {{-- Avatar / Icon --}}
                     <div class="shrink-0">
                         <template x-if="notif.data?.actor_photo">
-                            <img :src="'/storage/' + notif.data.actor_photo" 
+                            <img :src="'{{ asset('storage') }}/' + notif.data.actor_photo" 
                                  class="w-10 h-10 rounded-xl object-cover ring-2 ring-white dark:ring-slate-800 shadow-sm">
                         </template>
                         <template x-if="!notif.data?.actor_photo">
