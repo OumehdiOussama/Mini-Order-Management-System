@@ -155,7 +155,7 @@
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0 overflow-hidden">
                                     @if($product->image_path)
-                                        <img src="{{ asset('storage/' . $product->image_path) }}" 
+                                        <img src="{{ url('media/' . $product->image_path) }}" 
                                              alt="{{ $product->name }}" 
                                              class="w-full h-full object-cover">
                                     @else

@@ -40,7 +40,7 @@
         <div class="card p-5">
             <div class="flex items-start gap-5">
                 @if($customer->user && $customer->user->photo)
-                    <img src="{{ asset('storage/' . $customer->user->photo) }}" 
+                    <img src="{{ url('media/' . $customer->user->photo) }}" 
                          alt="{{ $customer->name }}" 
                          style="width:56px;height:56px;border-radius:14px;object-fit:cover;border:2px solid #6366f1;shrink:0">
                 @else

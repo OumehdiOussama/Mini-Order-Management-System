@@ -136,7 +136,7 @@
                 @endif
 
                 @if($product->image_path)
-                    <img src="{{ asset('storage/' . $product->image_path) }}" 
+                    <img src="{{ url('media/' . $product->image_path) }}" 
                          alt="{{ $product->name }}" 
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 @else

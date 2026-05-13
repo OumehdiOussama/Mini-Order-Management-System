@@ -33,7 +33,7 @@
         <div class="card overflow-hidden">
             <div class="h-72 bg-slate-100 dark:bg-slate-700 flex items-center justify-center relative">
                 @if($product->image_path)
-                    <img src="{{ asset('storage/' . $product->image_path) }}" 
+                    <img src="{{ url('media/' . $product->image_path) }}" 
                          alt="{{ $product->name }}" 
                          class="w-full h-full object-cover">
                 @else

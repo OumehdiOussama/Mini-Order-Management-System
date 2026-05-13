@@ -60,7 +60,7 @@
                 
                 @if($product->image_path)
                     <div class="mb-3 flex items-center gap-4">
-                        <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}" 
+                        <img src="{{ url('media/' . $product->image_path) }}" alt="{{ $product->name }}" 
                              class="w-24 h-24 object-cover rounded-lg border border-slate-200 dark:border-slate-700">
                         <label class="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 cursor-pointer">
                             <input type="checkbox" name="remove_image" value="1" class="rounded border-slate-300 dark:border-slate-600">

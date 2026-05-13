@@ -70,7 +70,7 @@
                                 <td>
                                     <div class="flex items-center gap-3">
                                         @if($customer->user && $customer->user->photo)
-                                            <img src="{{ asset('storage/' . $customer->user->photo) }}" 
+                                            <img src="{{ url('media/' . $customer->user->photo) }}" 
                                                  alt="{{ $customer->name }}" 
                                                  class="shrink-0 object-cover border border-slate-200 dark:border-slate-700"
                                                  style="width:34px;height:34px;border-radius:10px;">
