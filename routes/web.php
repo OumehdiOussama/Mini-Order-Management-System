@@ -71,3 +71,26 @@ Route::middleware("auth")->group(function(){
 
     Route::post('/logout', LogoutController::class)->name("logout");
 });
+
+// ══════════════════════════════════════════
+// EMERGENCY HOSTING FIX ROUTE
+// ══════════════════════════════════════════
+Route::get('/fix-system', function() {
+    try {
+        // 1. Clear all caches
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        $output = "Caches cleared successfully.<br>";
+
+        // 2. Create Storage Link
+        \Illuminate\Support\Facades\Artisan::call('storage:link');
+        $output .= "Storage symlink created.<br>";
+
+        // 3. Run Migrations (for notifications and password reset tokens)
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $output .= "Migrations executed.<br>";
+
+        return $output . "<br>🚀 System fixed! Please refresh your profile page.";
+    } catch (\Exception $e) {
+        return "Error during fix: " . $e->getMessage();
+    }
+});
