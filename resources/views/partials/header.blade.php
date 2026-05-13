@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-40 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-5 sm:px-6 lg:px-8">
+<header id="main-header" class="sticky top-0 z-40 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-5 sm:px-6 lg:px-8">
     <div class="w-full mx-auto max-w-7xl h-full flex items-center gap-4">
         {{-- Page Title --}}
         <div class="flex-1 min-w-0">

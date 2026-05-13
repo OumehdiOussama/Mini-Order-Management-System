@@ -25,9 +25,29 @@
     <style>
         [x-cloak] { display: none !important; }
         
+        /* 
+           VIEW TRANSITIONS API 
+           This makes navigation feel like a smooth SPA 
+        */
+        @view-transition {
+            navigation: auto;
+        }
+
         /* Sidebar Layout Control */
-        #sidebar { width: 256px; transition: width 0.3s ease-in-out, transform 0.3s ease-in-out; }
-        #main-content { margin-left: 256px; transition: margin-left 0.3s ease-in-out; }
+        #sidebar { 
+            width: 256px; 
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            contain: flex; 
+            view-transition-name: main-sidebar;
+        }
+        #main-header {
+            view-transition-name: main-header;
+        }
+        #main-content { 
+            margin-left: 256px; 
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+        }
         
         .sidebar-collapsed #sidebar { width: 72px; }
         .sidebar-collapsed #main-content { margin-left: 72px; }
@@ -36,9 +56,16 @@
             #main-content { margin-left: 0 !important; }
             #sidebar { transform: translateX(-100%); }
         }
+
+        /* Turbo Progress Bar Color */
+        .turbo-progress-bar {
+            background-color: #6366f1;
+            height: 3px;
+        }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon2.svg') }}">
     <title>@yield('title', 'Dashboard') | OMS</title>
@@ -56,6 +83,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Alpine.js pinned to stable version -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+    <!-- Turbo: Prevents full page reloads and layout flashes -->
+    <script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/dist/turbo.es2017-umd.js"></script>
 
     @stack('head')
 </head>
