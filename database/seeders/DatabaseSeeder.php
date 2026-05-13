@@ -20,22 +20,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
-            ['email' => env("ADMIN_EMAIL")],
-            [
-                'name' => "OUSSAMA OUMEHDI",
-                'password' => Hash::make(env("ADMIN_PASSWORD")),
-                'role' => "admin",
-                'account_verified_at' => now(),
-            ]
-        );
-
-        // Seed demo data
         $this->call([
-            CustomerSeeder::class,
-            ProductSeeder::class,
-            OrderSeeder::class,
-            OrderTimelineSeeder::class,
+            AdminSeeder::class,
         ]);
+
+        // demo data غير local
+        if (app()->environment('local')) {
+            $this->call([
+                CustomerSeeder::class,
+                ProductSeeder::class,
+                OrderSeeder::class,
+                OrderTimelineSeeder::class,
+            ]);
+        }
     }
 }
