@@ -47,11 +47,11 @@
                 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate;">
                     <tr>
                         <td style="vertical-align: middle;">
-                            <!-- Icon Box -->
-                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #6366f1; border-radius: 10px; width: 38px; height: 38px; border-collapse: separate;">
+                            <!-- Professional Logo with Fallback -->
+                            <table border="0" cellpadding="0" cellspacing="0" style="background-color: #6366f1; border-radius: 12px; width: 48px; height: 48px; border-collapse: separate;">
                                 <tr>
-                                    <td align="center" valign="middle" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 900; color: #ffffff; line-height: 1;">
-                                        O
+                                    <td align="center" valign="middle">
+                                        <img src="{{ asset('favicon2.svg') }}" alt="OMS" width="48" height="48" style="display: block; border: 0; border-radius: 12px;">
                                     </td>
                                 </tr>
                             </table>
