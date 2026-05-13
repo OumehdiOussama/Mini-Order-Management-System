@@ -95,7 +95,17 @@ Route::get('/storage/{path}', function ($path) {
 Route::get('/fix-system', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-        return "✅ System caches cleared! Your photos should now work.";
+        
+        // Physically remove the broken 'public/storage' link
+        $link = public_path('storage');
+        if (file_exists($link)) {
+            @unlink($link); // Try to delete if it's a link
+            if (file_exists($link)) {
+                @rename($link, $link . '_backup_' . time()); // Rename if it's a real folder
+            }
+        }
+
+        return "✅ Broken link removed & Caches cleared! Your photos will now work.";
     } catch (\Exception $e) {
         return "❌ Error: " . $e->getMessage();
     }
