@@ -98,18 +98,27 @@ Route::get('/fix-system', function() {
         \Illuminate\Support\Facades\Artisan::call('storage:link');
         $output .= "✅ Storage symlink recreated.<br>";
 
-        // 3. Database Table Verification
+        // 3. File System Check
+        $authPath = resource_path('views/auth');
+        if (is_dir($authPath)) {
+            $files = scandir($authPath);
+            $output .= "✅ Folder 'resources/views/auth' found. Files: " . implode(', ', $files) . "<br>";
+        } else {
+            $output .= "❌ Folder 'resources/views/auth' NOT FOUND!<br>";
+        }
+
+        // 4. Database Table Verification
         $tables = ['users', 'products', 'orders', 'notifications', 'password_reset_tokens'];
         foreach ($tables as $table) {
             if (\Illuminate\Support\Facades\Schema::hasTable($table)) {
                 $output .= "✅ Table '{$table}' exists.<br>";
             } else {
-                $output .= "❌ Table '{$table}' IS MISSING! Trying to migrate...<br>";
+                $output .= "❌ Table '{$table}' IS MISSING!<br>";
                 \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
             }
         }
 
-        return $output . "<br>🚀 **Deep Refresh Complete!** Please check if the 500 error persists.";
+        return $output . "<br>🚀 **Diagnostic Complete!**";
     } catch (\Exception $e) {
         return "❌ Critical Error: " . $e->getMessage();
     }
