@@ -96,16 +96,27 @@ Route::get('/fix-system', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
         
-        // Physically remove the broken 'public/storage' link
         $link = public_path('storage');
         if (file_exists($link)) {
-            @unlink($link); // Try to delete if it's a link
-            if (file_exists($link)) {
-                @rename($link, $link . '_backup_' . time()); // Rename if it's a real folder
-            }
+            @unlink($link);
+            if (file_exists($link)) @rename($link, $link . '_old_' . time());
         }
 
-        return "✅ Broken link removed & Caches cleared! Your photos will now work.";
+        // --- SCAN STORAGE ---
+        $output = "--- Path Scan ---<br>";
+        $paths = [
+            storage_path('app/public/avatars'),
+            storage_path('app/avatars'),
+            public_path('avatars')
+        ];
+        
+        foreach ($paths as $p) {
+            $exists = is_dir($p) ? "✅ FOUND" : "❌ MISSING";
+            $count = is_dir($p) ? count(array_diff(scandir($p), ['.', '..'])) : 0;
+            $output .= "{$p}: {$exists} ({$count} files)<br>";
+        }
+
+        return $output . "<br>🚀 **Scan complete!** Please tell me what you see above.";
     } catch (\Exception $e) {
         return "❌ Error: " . $e->getMessage();
     }
