@@ -74,9 +74,9 @@ Route::middleware("auth")->group(function(){
 });
 
 // ══════════════════════════════════════════
-// STORAGE PROXY (Fixes broken photos on Cloud Hosting)
+// MEDIA PROXY (Bypasses Cloud Storage Blocks)
 // ══════════════════════════════════════════
-Route::get('/storage/{path}', function ($path) {
+Route::get('/media/{path}', function ($path) {
     $fullPath = storage_path('app/public/' . $path);
     
     if (!File::exists($fullPath)) {

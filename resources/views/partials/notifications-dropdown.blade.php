@@ -128,7 +128,7 @@
                     {{-- Avatar / Icon --}}
                     <div class="shrink-0">
                         <template x-if="notif.data?.actor_photo">
-                            <img :src="'{{ asset('storage') }}/' + notif.data.actor_photo" 
+                            <img :src="'{{ url('media') }}/' + notif.data.actor_photo" 
                                  class="w-10 h-10 rounded-xl object-cover ring-2 ring-white dark:ring-slate-800 shadow-sm">
                         </template>
                         <template x-if="!notif.data?.actor_photo">
@@ -170,7 +170,7 @@
                                           x-text="notif.data.amount"></span>
                                 </template>
                                 <template x-if="notif.data?.status">
-                                    <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[10px] font-bold rounded-md border border-blue-100 dark:border-blue-800" 
+                                    <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:bg-blue-400 text-[10px] font-bold rounded-md border border-blue-100 dark:border-blue-800" 
                                           x-text="notif.data.status.toUpperCase()"></span>
                                 </template>
                             </div>

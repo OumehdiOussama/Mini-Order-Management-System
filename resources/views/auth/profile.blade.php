@@ -78,7 +78,7 @@
                             </template>
                             <template x-if="!photoPreview">
                                 @if(auth()->user()->photo)
-                                    <img src="{{ asset('storage/' . auth()->user()->photo) }}" class="w-full h-full object-cover">
+                                    <img src="{{ url('media/' . auth()->user()->photo) }}" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-3xl font-bold text-white" 
                                          style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
