@@ -51,7 +51,7 @@
                             <table border="0" cellpadding="0" cellspacing="0" style="background-color: #6366f1; border-radius: 12px; width: 48px; height: 48px; border-collapse: separate;">
                                 <tr>
                                     <td align="center" valign="middle">
-                                        <img src="data:image/svg+xml;base64,{{ base64_encode(file_get_contents(public_path('favicon2.svg'))) }}" alt="OMS" width="48" height="48" style="display: block; border: 0; border-radius: 12px;">
+                                        <img src="{{ asset('favicon2.png') }}" alt="OMS" width="48" height="48" style="display: block; border: 0; border-radius: 12px;">
                                     </td>
                                 </tr>
                             </table>
