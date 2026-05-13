@@ -24,21 +24,67 @@
     </div>
 </div>
  
- {{-- Search --}}
- <div class="card px-4 py-3 mb-5 flex items-center gap-3">
-     <form method="GET" action="{{ route('products.index') }}" class="flex-1 flex gap-3">
-         <div class="relative flex-1">
-             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-             </svg>
-             <input type="text" name="search" value="{{ request('search') }}"
-                    placeholder="Search products by name…"
-                    class="input-field pl-9">
+ {{-- Filter Bar --}}
+ <div class="card px-4 py-3 mb-5">
+     <form method="GET" action="{{ route('products.index') }}" class="flex flex-wrap gap-3 items-end">
+         {{-- Search --}}
+         <div class="flex-1 min-w-[200px]">
+             <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block ml-1">Search</label>
+             <div class="relative">
+                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                 </svg>
+                 <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Search products…"
+                        class="input-field pl-9 h-10">
+             </div>
          </div>
-         <button type="submit" class="btn-primary">Search</button>
-         @if(request('search'))
-         <a href="{{ route('products.index') }}" class="btn-ghost">Clear</a>
-         @endif
+
+         {{-- Category Filter --}}
+         <div class="w-full sm:w-44">
+             <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block ml-1">Category</label>
+             <select name="category" class="select-field h-10" onchange="this.form.submit()">
+                 <option value="">All Categories</option>
+                 @foreach($categories as $cat)
+                 <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                 @endforeach
+             </select>
+         </div>
+
+         {{-- Price Filter --}}
+         <div class="flex items-center gap-2">
+             <div class="w-32">
+                 <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block ml-1">Min Price</label>
+                 <input type="number" name="min_price" value="{{ request('min_price') }}"
+                        placeholder="Min Price" class="input-field h-10" min="0">
+             </div>
+             <div class="w-32">
+                 <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block ml-1">Max Price</label>
+                 <input type="number" name="max_price" value="{{ request('max_price') }}"
+                        placeholder="Max Price" class="input-field h-10" min="0">
+             </div>
+         </div>
+
+         <div class="flex flex-col">
+             <span class="text-[10px] mb-1 block">&nbsp;</span>
+             <div class="flex gap-2">
+                 <button type="submit" class="btn-primary h-10 px-5 flex items-center gap-2 shadow-sm shadow-brand-500/20">
+                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                     </svg>
+                     <span>Filter</span>
+                 </button>
+                 
+                 @if(request()->anyFilled(['search', 'category', 'min_price', 'max_price']))
+                 <a href="{{ route('products.index') }}" class="btn-ghost h-10 px-4 flex items-center gap-2 text-slate-500 hover:text-red-600 transition-colors">
+                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                     </svg>
+                     <span>Clear</span>
+                 </a>
+                 @endif
+             </div>
+         </div>
      </form>
  </div>
 
@@ -164,10 +210,13 @@
             {{-- Card Body --}}
             <div class="p-4 flex flex-col flex-1">
                 <div class="flex items-start justify-between gap-2 mb-1">
-                    <a href="{{ route('products.show', $product) }}"
-                       class="text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-400 line-clamp-2">
-                        {{ $product->name }}
-                    </a>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400 mb-0.5">{{ $product->category ?? 'General' }}</span>
+                        <a href="{{ route('products.show', $product) }}"
+                           class="text-sm font-bold text-slate-800 dark:text-slate-200 hover:text-brand-600 dark:hover:text-brand-400 line-clamp-2">
+                            {{ $product->name }}
+                        </a>
+                    </div>
                 </div>
                 
                 <div class="flex items-center gap-2 mb-3">

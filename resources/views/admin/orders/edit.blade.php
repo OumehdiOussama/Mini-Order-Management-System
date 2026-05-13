@@ -63,6 +63,7 @@
 
         <form method="POST" action="{{ route('orders.update', $order) }}"
               x-data="{ selectedStatus: '{{ old('status', $order->status) }}' }"
+              class="space-y-5"
               hx-boost="false">
         @csrf
         @method('PUT')
@@ -197,9 +198,15 @@
                         #{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}
                     </span>
                 </div>
-                <div class="flex justify-between">
+                <div class="flex justify-between items-center">
                     <span class="text-slate-500">Customer</span>
-                    <span class="font-medium text-slate-800 dark:text-slate-200">{{ $order->customer->name }}</span>
+                    <div class="flex items-center gap-2">
+                        @if($order->customer->user && $order->customer->user->photo)
+                            <img src="{{ url('media/' . $order->customer->user->photo) }}" 
+                                 class="w-6 h-6 rounded-md object-cover">
+                        @endif
+                        <span class="font-medium text-slate-800 dark:text-slate-200">{{ $order->customer->name }}</span>
+                    </div>
                 </div>
                 <div class="flex justify-between">
                     <span class="text-slate-500">Items</span>

@@ -315,10 +315,17 @@
                     </td>
                     <td>
                         <div class="flex items-center gap-2.5">
-                            <div class="avatar-sm shrink-0"
-                                 style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:11px; color:white; font-weight:700;">
-                                {{ strtoupper(substr($order->customer->name ?? '?', 0, 2)) }}
-                            </div>
+                            @if($order->customer && $order->customer->user && $order->customer->user->photo)
+                                <img src="{{ url('media/' . $order->customer->user->photo) }}" 
+                                     alt="{{ $order->customer->name }}" 
+                                     class="shrink-0 object-cover border border-slate-200 dark:border-slate-700"
+                                     style="width:28px;height:28px;border-radius:6px;">
+                            @else
+                                <div class="avatar-sm shrink-0"
+                                     style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:11px; color:white; font-weight:700;">
+                                    {{ strtoupper(substr($order->customer->name ?? '?', 0, 2)) }}
+                                </div>
+                            @endif
                             <div>
                                 <p class="text-sm font-medium text-slate-800 dark:text-slate-200">{{ $order->customer->name ?? 'Deleted' }}</p>
                                 <p class="text-xs text-slate-400">{{ $order->customer->email ?? '' }}</p>

@@ -39,9 +39,16 @@
             {{-- Profile Card --}}
             <div class="card p-5">
                 <div class="flex items-start gap-5">
-                    <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:20px;color:white;font-weight:700;shrink:0">
-                        {{ strtoupper(substr($customer->name, 0, 2)) }}
-                    </div>
+                    @if($customer->user && $customer->user->photo)
+                        <img src="{{ url('media/' . $customer->user->photo) }}" 
+                             alt="{{ $customer->name }}" 
+                             class="shrink-0 object-cover border border-slate-200 dark:border-slate-700 shadow-sm"
+                             style="width:56px;height:56px;border-radius:14px;">
+                    @else
+                        <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:20px;color:white;font-weight:700;shrink:0">
+                            {{ strtoupper(substr($customer->name, 0, 2)) }}
+                        </div>
+                    @endif
                     <div class="flex-1">
                         <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ $customer->name }}</h2>
                         <p class="text-sm text-slate-400 mt-0.5">Member since {{ $customer->created_at->format('M d, Y') }}</p>

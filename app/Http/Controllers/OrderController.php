@@ -35,28 +35,48 @@ class OrderController extends Controller
             if ($user->customer) {
                 $query->where('customer_id', $user->customer->id);
             } else {
-                $query->where('id', '<', 0); // No orders if no profile
+                $query->where('id', '<', 0);
+            }
+        } else {
+            // Admin only filters
+            if ($request->filled('customer_id')) {
+                $query->where('customer_id', $request->customer_id);
             }
         }
 
-        // Filter by Status
+        // Shared Filters
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Search by Customer Name or Email
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
+
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('customer', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhereHas('customer', function($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                  });
             });
         }
 
         $orders = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
         
+        $customers = [];
+        if ($user->role === 'admin') {
+            $customers = Customer::orderBy('name')->select(['id', 'name'])->get();
+        }
+
         $viewPath = $user->role === 'customer' ? 'customer.orders.index' : 'admin.orders.index';
-        return view($viewPath, compact('orders'));
+        return view($viewPath, compact('orders', 'customers'));
     }
 
     /*
@@ -78,13 +98,16 @@ class OrderController extends Controller
         }
 
         // Only show active products with stock, select only needed columns
-        $products = Product::select(['id', 'name', 'price', 'stock', 'image_path'])
+        $products = Product::select(['id', 'name', 'price', 'stock', 'image_path', 'category'])
             ->where('stock', '>', 0)
+            ->where('is_active', true)
             ->orderBy('name')
             ->get();
 
+        $categories = $products->pluck('category')->unique()->filter()->values();
+
         $viewPath = $user->role === 'customer' ? 'customer.orders.create' : 'admin.orders.create';
-        return view($viewPath, compact('customers', 'products'));
+        return view($viewPath, compact('customers', 'products', 'categories'));
     }
 
     /*

@@ -30,6 +30,7 @@ class OrderService
             ]);
 
             $productsToAttach = [];
+            $totalAmount = 0;
             foreach ($data['products'] as $productId => $val) {
                 $quantity = (int) ($data['quantities'][$productId] ?? 1);
                 if ($quantity >= 1) {
@@ -44,9 +45,11 @@ class OrderService
                     $product->decrement('stock', $quantity);
                     
                     $productsToAttach[$productId] = ['quantity' => $quantity];
+                    $totalAmount += $product->price * $quantity;
                 }
             }
             $order->products()->attach($productsToAttach);
+            $order->update(['total_amount' => $totalAmount]);
 
             $order->addTimeline('pending', 'Order created');
 

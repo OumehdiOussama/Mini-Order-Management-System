@@ -18,34 +18,50 @@
 </div>
 
 {{-- Filter Bar --}}
-<div x-data="{ search: '{{ request('search') }}', status: '{{ request('status') }}' }"
-     class="card px-4 py-3 mb-5 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-    <form method="GET" action="{{ route('orders.index') }}" class="flex-1 flex flex-col sm:flex-row gap-3 w-full">
+<div class="card px-4 py-3 mb-5">
+    <form method="GET" action="{{ route('orders.index') }}" class="flex flex-wrap gap-4 items-end">
         {{-- Search --}}
-        <div class="relative flex-1">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            <input type="text" name="search" value="{{ request('search') }}"
-                   placeholder="Search by customer or order ID…"
-                   class="input-field pl-9">
+        <div class="flex-1 min-w-[200px]">
+            <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block ml-1">Search Order ID</label>
+            <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" name="search" value="{{ request('search') }}"
+                       placeholder="Search by ID…"
+                       class="input-field pl-9 h-10">
+            </div>
         </div>
+
         {{-- Status Filter --}}
-        <select name="status" class="select-field w-full sm:w-44" onchange="this.form.submit()">
-            <option value="">All Statuses</option>
-            @foreach(['pending','processing','shipped','delivered','cancelled'] as $s)
-            <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
-            @endforeach
-        </select>
-        <button type="submit" class="btn-primary">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
-            </svg>
-            Filter
-        </button>
-        @if(request()->anyFilled(['search','status']))
-        <a href="{{ route('orders.index') }}" class="btn-ghost">Clear</a>
-        @endif
+        <div class="w-full sm:w-48">
+            <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block ml-1">Status</label>
+            <select name="status" class="select-field h-10" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                @foreach(['pending','processing','shipped','delivered','cancelled'] as $s)
+                <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- Date Filters --}}
+        <div class="flex items-center gap-2">
+            <div class="w-32">
+                <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block ml-1">From</label>
+                <input type="date" name="start_date" value="{{ request('start_date') }}" class="input-field h-10">
+            </div>
+            <div class="w-32">
+                <label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block ml-1">To</label>
+                <input type="date" name="end_date" value="{{ request('end_date') }}" class="input-field h-10">
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <button type="submit" class="btn-primary h-10 px-6">Filter</button>
+            @if(request()->anyFilled(['search', 'status', 'start_date', 'end_date']))
+            <a href="{{ route('orders.index') }}" class="btn-ghost h-10 flex items-center">Clear</a>
+            @endif
+        </div>
     </form>
 </div>
 

@@ -24,7 +24,15 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Customer::class);
-        $query = Customer::query();
+        $query = Customer::query()
+            ->withCount('orders')
+            ->addSelect(['total_spent' => \App\Models\Order::selectRaw('sum(total_amount)')
+                ->whereColumn('customer_id', 'customers.id')
+                ->where('status', '!=', 'cancelled')
+            ]);
+            
+        // Note: If Order doesn't have a total_amount column, we'd need a more complex join.
+        // Let's check Order table first.
         
         // Search customers by name or email
         if ($request->filled('search')) {
@@ -32,8 +40,22 @@ class CustomerController extends Controller
             $query->where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%");
         }
+
+        // Sorting
+        $sort = $request->get('sort', 'newest');
+        if ($sort === 'newest') {
+            $query->latest();
+        } elseif ($sort === 'oldest') {
+            $query->oldest();
+        } elseif ($sort === 'spent_high') {
+            $query->orderBy('total_spent', 'desc');
+        } elseif ($sort === 'spent_low') {
+            $query->orderBy('total_spent', 'asc');
+        } else {
+            $query->latest();
+        }
         
-        $customers = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
+        $customers = $query->paginate(10)->withQueryString();
         return view('admin.customers.index', compact('customers'));
     }
 

@@ -32,6 +32,13 @@
             </div>
 
             <div class="form-group">
+                <label for="category" class="input-label">Category</label>
+                <input type="text" id="category" name="category" value="{{ old('category', 'General') }}"
+                       class="input-field" placeholder="e.g. Electronics, Furniture...">
+                @error('category') <span class="input-error">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="form-group">
                 <label for="description" class="input-label">Description</label>
                 <textarea id="description" name="description" rows="3" 
                           class="input-field" placeholder="Describe the product features...">{{ old('description') }}</textarea>
