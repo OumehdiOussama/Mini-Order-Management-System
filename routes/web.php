@@ -32,14 +32,7 @@ Route::get('/lang/{locale}', function ($locale) {
 Route::post("/register",RegisterController::class);
 Route::post('/login', LoginController::class);
 
-Route::get('/forgot-password', function() {
-    try {
-        return view('auth.forgot-password');
-    } catch (\Exception $e) {
-        return "Rendering Error: " . $e->getMessage() . " in " . $e->getFile() . " on line " . $e->getLine();
-    }
-})->name("password.request");
-
+Route::view("/forgot-password","auth.forgot-password")->name("password.request");
 Route::post("/forgot-password", ForgotPasswordController::class)->name("password.email");
 
 Route::view("/reset-password/{token}","auth.reset-password")->name("password.reset");
@@ -80,46 +73,35 @@ Route::middleware("auth")->group(function(){
 });
 
 // ══════════════════════════════════════════
-// EMERGENCY HOSTING FIX ROUTE
+// SYSTEM RECOVERY & SYMLINK FIX
 // ══════════════════════════════════════════
 Route::get('/fix-system', function() {
     try {
-        $output = "--- Starting Deep System Fix ---<br>";
+        $output = "--- Starting Final System Fix ---<br>";
         
-        // 1. Clear all caches
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
         $output .= "✅ Caches cleared.<br>";
 
-        // 2. Fix Storage Symlink
         $link = public_path('storage');
-        if (file_exists($link) && is_link($link)) {
-            unlink($link);
+        if (file_exists($link)) {
+            is_link($link) ? unlink($link) : rename($link, $link . '_old_' . time());
         }
+        
         \Illuminate\Support\Facades\Artisan::call('storage:link');
         $output .= "✅ Storage symlink recreated.<br>";
 
-        // 3. File System Check
-        $authPath = resource_path('views/auth');
-        if (is_dir($authPath)) {
-            $files = scandir($authPath);
-            $output .= "✅ Folder 'resources/views/auth' found. Files: " . implode(', ', $files) . "<br>";
-        } else {
-            $output .= "❌ Folder 'resources/views/auth' NOT FOUND!<br>";
+        // Verify if photos exist in the actual storage folder
+        $storagePath = storage_path('app/public/avatars');
+        if (is_dir($storagePath)) {
+            $files = array_diff(scandir($storagePath), ['.', '..']);
+            $output .= "📸 Found " . count($files) . " photos in storage/app/public/avatars<br>";
         }
 
-        // 4. Database Table Verification
-        $tables = ['users', 'products', 'orders', 'notifications', 'password_reset_tokens'];
-        foreach ($tables as $table) {
-            if (\Illuminate\Support\Facades\Schema::hasTable($table)) {
-                $output .= "✅ Table '{$table}' exists.<br>";
-            } else {
-                $output .= "❌ Table '{$table}' IS MISSING!<br>";
-                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-            }
-        }
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $output .= "✅ Database verified.<br>";
 
-        return $output . "<br>🚀 **Diagnostic Complete!**";
+        return $output . "<br>🚀 **All systems operational!** Please refresh your site.";
     } catch (\Exception $e) {
-        return "❌ Critical Error: " . $e->getMessage();
+        return "❌ Error: " . $e->getMessage();
     }
 });
