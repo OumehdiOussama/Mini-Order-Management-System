@@ -16,6 +16,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Api\DashboardApiController;
 use App\Http\Controllers\Api\NotificationApiController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\File;
 
 
 Route::view("/", "welcome")->name('home');
@@ -73,34 +74,28 @@ Route::middleware("auth")->group(function(){
 });
 
 // ══════════════════════════════════════════
-// SYSTEM RECOVERY & SYMLINK FIX
+// STORAGE PROXY (Fixes broken photos on Cloud Hosting)
+// ══════════════════════════════════════════
+Route::get('/storage/{path}', function ($path) {
+    $fullPath = storage_path('app/public/' . $path);
+    
+    if (!File::exists($fullPath)) {
+        abort(404);
+    }
+
+    $file = File::get($fullPath);
+    $type = File::mimeType($fullPath);
+
+    return response($file)->header("Content-Type", $type);
+})->where('path', '.*');
+
+// ══════════════════════════════════════════
+// SYSTEM RECOVERY (Run once to clear caches)
 // ══════════════════════════════════════════
 Route::get('/fix-system', function() {
     try {
-        $output = "--- Starting Final System Fix ---<br>";
-        
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-        $output .= "✅ Caches cleared.<br>";
-
-        $link = public_path('storage');
-        if (file_exists($link)) {
-            is_link($link) ? unlink($link) : rename($link, $link . '_old_' . time());
-        }
-        
-        \Illuminate\Support\Facades\Artisan::call('storage:link');
-        $output .= "✅ Storage symlink recreated.<br>";
-
-        // Verify if photos exist in the actual storage folder
-        $storagePath = storage_path('app/public/avatars');
-        if (is_dir($storagePath)) {
-            $files = array_diff(scandir($storagePath), ['.', '..']);
-            $output .= "📸 Found " . count($files) . " photos in storage/app/public/avatars<br>";
-        }
-
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        $output .= "✅ Database verified.<br>";
-
-        return $output . "<br>🚀 **All systems operational!** Please refresh your site.";
+        return "✅ System caches cleared! Your photos should now work.";
     } catch (\Exception $e) {
         return "❌ Error: " . $e->getMessage();
     }
