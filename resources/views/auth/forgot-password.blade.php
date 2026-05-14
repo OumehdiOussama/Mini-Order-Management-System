@@ -31,10 +31,11 @@
                    class="input-field" placeholder="you@example.com" autofocus>
             @error('email') <span class="input-error">{{ $message }}</span> @enderror
         </div>
-        <button type="submit"
-                class="w-full py-2.5 bg-gradient-to-r from-brand-500 to-violet-500 hover:from-brand-600 hover:to-violet-600 text-white font-semibold rounded-lg transition-all duration-200 shadow-sm text-sm">
-            Send Reset Link
-        </button>
+        <div class="pt-2">
+            <button type="submit" class="btn-primary w-full justify-center py-2.5">
+                Send Reset Link
+            </button>
+        </div>
     </form>
 
     <p class="text-center text-sm text-slate-500 mt-6">

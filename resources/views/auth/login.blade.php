@@ -78,7 +78,7 @@
         </div>
 
         <button type="submit"
-                class="w-full py-2.5 bg-gradient-to-r from-brand-500 to-violet-500 hover:from-brand-600 hover:to-violet-600 text-white font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md text-sm mt-2">
+                class="btn-primary w-full justify-center py-2.5 mt-2">
             Sign In
         </button>
     </form>

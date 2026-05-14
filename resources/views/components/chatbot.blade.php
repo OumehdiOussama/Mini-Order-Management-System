@@ -34,7 +34,14 @@
         </div>
 
         <!-- Messages Area -->
-        <div id="chat-messages" class="p-4 flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 flex flex-col space-y-3 min-h-0">
+        <div id="chat-messages" 
+             x-init="
+                 const observer = new MutationObserver(() => {
+                     $el.scrollTop = $el.scrollHeight;
+                 });
+                 observer.observe($el, { childList: true, subtree: true, characterData: true });
+             "
+             class="p-4 flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 flex flex-col space-y-3 min-h-0">
             <template x-for="msg in messages">
                 <div :class="msg.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
                     <div :class="msg.role === 'user' ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl rounded-tl-none'"
