@@ -169,22 +169,4 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Order deleted successfully!');
     }
 
-    /*
-     * Export orders to Excel
-     */
-    public function export()
-    {
-        return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\OrdersExport, 'orders.xlsx');
-    }
-
-    /*
-     * Download Order Invoice (PDF)
-     */
-    public function invoice(Order $order)
-    {
-        Gate::authorize('downloadInvoice', $order);
-        $order->load(['customer', 'products']);
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('invoices.order', compact('order'));
-        return $pdf->download('invoice-' . $order->id . '.pdf');
-    }
 }
